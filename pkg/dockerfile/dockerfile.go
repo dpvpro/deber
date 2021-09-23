@@ -37,8 +37,12 @@ RUN printf "Package: *\nPin: origin \"\"\nPin-Priority: 990\n" > /etc/apt/prefer
 # Install required packages.
 RUN apt-get update && \
 	apt-get install --no-install-recommends -y \
-	build-essential devscripts debhelper lintian fakeroot dpkg-dev libperl-dev libssl-dev \
-	bison
+	build-essential devscripts debhelper lintian fakeroot dpkg-dev libperl-dev libssl-dev bison wget && \
+	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+	echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+	echo "deb-src http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list && \
+	apt update && \
+	apt install postgresql-all
 
 # Set working directory.
 WORKDIR {{ .SourceDir }}
