@@ -28,7 +28,7 @@ var (
 	cacheDir     = pflag.StringP("cache-dir", "C", "/tmp", "where to place cached stuff")
 	distribution = pflag.StringP("distribution", "d", "", "override target distribution")
 	packages     = pflag.StringArrayP("package", "p", nil, "additional packages to be installed in container (either single .deb or a directory)")
-	age          = pflag.DurationP("age", "a", time.Hour*24*14, "time after which image will be refreshed")
+	age          = pflag.DurationP("age", "a", time.Hour*24*180, "time after which image will be refreshed")
 	network      = pflag.BoolP("network", "n", false, "allow network access during package build")
 	shell        = pflag.BoolP("shell", "s", false, "launch interactive shell in container")
 	dpkgFlags    = pflag.StringP("dpkg-flags", "D", "-tc", "additional flags to be passed to dpkg-buildpackage in container")
