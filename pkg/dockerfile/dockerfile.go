@@ -35,14 +35,22 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN printf "Package: *\nPin: origin \"\"\nPin-Priority: 990\n" > /etc/apt/preferences.d/00a
 
 # Install required packages.
+RUN rm -f /etc/apt/sources.list && \
+	echo 'deb http://192.168.11.118/ bullseye main' | tee /etc/apt/sources.list && \
+	echo 'deb-src http://192.168.11.118/ bullseye main' | tee -a /etc/apt/sources.list && \
+	apt-get update --allow-insecure-repositories && \
+	apt-get install wget gnupg2 -y --allow-unauthenticated && \
+	wget -qO - http://192.168.11.118/veil-repo-key.gpg | apt-key add -
+
 RUN apt-get update && \
 	apt-get install --no-install-recommends -y \
-	build-essential devscripts debhelper lintian fakeroot dpkg-dev libperl-dev libssl-dev bison wget && \
-	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+	build-essential devscripts debhelper lintian fakeroot dpkg-dev libperl-dev libssl-dev bison wget
+
+RUN	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
 	echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-	echo "deb-src http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list && \
-	apt update && \
-	apt install postgresql-all
+	echo "deb-src http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+
+RUN apt update && apt install postgresql-all
 
 # Set working directory.
 WORKDIR {{ .SourceDir }}
