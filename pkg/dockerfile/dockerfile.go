@@ -31,8 +31,6 @@ RUN echo "APT::Get::Assume-Yes "true";" > /etc/apt/apt.conf.d/00noconfirm
 # Set debconf to be non interactive.
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-# Pin local repo (apt-get -t option pins with priority 990 too).
-RUN printf "Package: *\nPin: origin \"\"\nPin-Priority: 990\n" > /etc/apt/preferences.d/00a
 
 # Install required packages.
 RUN rm -f /etc/apt/sources.list && \
@@ -41,6 +39,19 @@ RUN rm -f /etc/apt/sources.list && \
 	apt-get update --allow-insecure-repositories && \
 	apt-get install wget gnupg2 -y --allow-unauthenticated && \
 	wget -qO - http://192.168.11.118/veil-repo-key.gpg | apt-key add -
+
+
+# upgrade/downgrade пакетов до версий в зеркале
+RUN printf "Package: *\nPin: release a=bullseye\nPin-Priority: 1001\n" > /etc/apt/preferences
+
+RUN apt-get update && \
+	apt-get dist-upgrade -y --allow-downgrades && \
+	rm -f /etc/apt/preferences && \
+	apt-get update
+
+# Pin local repo (apt-get -t option pins with priority 990 too).
+RUN printf "Package: *\nPin: origin \"\"\nPin-Priority: 990\n" > /etc/apt/preferences.d/00a
+
 
 RUN apt-get update && \
 	apt-get install --no-install-recommends -y \
