@@ -31,13 +31,12 @@ RUN echo "APT::Get::Assume-Yes "true";" > /etc/apt/apt.conf.d/00noconfirm
 # Set debconf to be non interactive.
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-
 # Install required packages.
 RUN rm -f /etc/apt/sources.list && \
 	echo 'deb http://192.168.11.118/ bullseye main' | tee /etc/apt/sources.list && \
 	echo 'deb-src http://192.168.11.118/ bullseye main' | tee -a /etc/apt/sources.list && \
 	apt-get update --allow-insecure-repositories && \
-	apt-get install wget gnupg2 -y --allow-unauthenticated && \
+	apt-get install wget gnupg2 tar bzip2 mc htop -y --allow-unauthenticated && \
 	wget -qO - http://192.168.11.118/veil-repo-key.gpg | apt-key add -
 
 
@@ -52,6 +51,11 @@ RUN apt-get update && \
 # Pin local repo (apt-get -t option pins with priority 990 too).
 RUN printf "Package: *\nPin: origin \"\"\nPin-Priority: 990\n" > /etc/apt/preferences.d/00a
 
+RUN cd /root && wget -q http://192.168.10.144/files/svace/svace-3.1.1-x64-linux.tar.bz2 && \
+	tar xvf svace-3.1.1-x64-linux.tar.bz2 && \
+	mv svace-3.1.1-x64-linux /opt/svace-311
+
+ENV PATH "$PATH:/opt/svace-311/bin/"
 
 RUN apt-get update && \
 	apt-get install --no-install-recommends -y \
