@@ -91,6 +91,10 @@ func Create(dock *docker.Docker, n *naming.Naming, extraPackages []string) error
 			Type:   mount.TypeBind,
 			Source: n.CacheDir,
 			Target: naming.ContainerCacheDir,
+		}, {
+			Type:   mount.TypeBind,
+			Source: n.SvaceDir,
+			Target: naming.ContainerSvaceDir,
 		},
 	}
 

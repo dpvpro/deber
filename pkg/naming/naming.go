@@ -20,6 +20,9 @@ const (
 	// ContainerCacheDir constant represents where on container will
 	// cache directory be mounted
 	ContainerCacheDir = "/var/cache/apt"
+	// ContainerSvaceDir constant represents where on container will
+	// svace app directory be mounted
+	ContainerSvaceDir = "/build/svace"
 )
 
 // Naming struct holds various information naming information
@@ -41,6 +44,8 @@ type Naming struct {
 	BuildDir string
 	// CacheDir is an absolute path where apt cache is stored
 	CacheDir string
+	// SvaceDir is an absolute path where svace dir is stored
+	SvaceDir string
 	// ArchiveDir is an absolute path where
 	// all built packages are stored
 	ArchiveDir string
@@ -77,6 +82,9 @@ type Args struct {
 	CacheBaseDir string
 	// ArchiveBaseDir is a directory where all build packages are stored
 	ArchiveBaseDir string
+	// SvaceBaseDir is a directory where all svace dirs are stored
+	SvaceBaseDir string
+
 }
 
 // New creates new instance of Naming struct
@@ -101,6 +109,8 @@ func New(args Args) *Naming {
 		ArchiveTargetDir:  filepath.Join(args.ArchiveBaseDir, args.Target),
 		ArchiveSourceDir:  filepath.Join(args.ArchiveBaseDir, args.Target, args.Source),
 		ArchiveVersionDir: filepath.Join(args.ArchiveBaseDir, args.Target, args.Source, args.Version),
+		SvaceDir:          args.SvaceBaseDir,
+
 	}
 }
 

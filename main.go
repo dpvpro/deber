@@ -37,6 +37,7 @@ var (
 	noLogColor   = pflag.BoolP("no-log-color", "c", false, "do not colorize log output")
 	noRemove     = pflag.BoolP("no-remove", "r", false, "do not remove container at the end of the process")
 	test         = pflag.BoolP("test", "t", false, "do test package at the end of the process")
+	svaceDir     = pflag.StringP("svace-dir", "V", "/tmp", "where to place svace stuff")
 )
 
 func main() {
@@ -97,6 +98,8 @@ func run(cmd *cobra.Command, args []string) error {
 		BuildBaseDir:   *buildDir,
 		CacheBaseDir:   *cacheDir,
 		ArchiveBaseDir: filepath.Join(home, Program),
+		SvaceBaseDir:   *svaceDir,
+
 	}
 	n := naming.New(namingArgs)
 
