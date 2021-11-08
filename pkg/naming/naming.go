@@ -44,8 +44,6 @@ type Naming struct {
 	BuildDir string
 	// CacheDir is an absolute path where apt cache is stored
 	CacheDir string
-	// SvaceDir is an absolute path where svace dir is stored
-	SvaceDir string
 	// ArchiveDir is an absolute path where
 	// all built packages are stored
 	ArchiveDir string
@@ -58,6 +56,18 @@ type Naming struct {
 	// ArchiveVersionDir is an absolute path where
 	// all built packages for given source version are stored
 	ArchiveVersionDir string
+	// SvaceDir is an absolute path where svace dir is stored
+	SvaceDir string
+	// ArchiveTargetDir is an absolute path where
+	// all built packages for given target are stored
+	SvaceTargetDir string
+	// ArchiveSourceDir is an absolute path where
+	// all built packages for given source are stored
+	SvaceSourceDir string
+	// ArchiveVersionDir is an absolute path where
+	// all built packages for given source version are stored
+	SvaceVersionDir string
+
 }
 
 // Args struct holds information about package base directories and prefix
@@ -110,6 +120,9 @@ func New(args Args) *Naming {
 		ArchiveSourceDir:  filepath.Join(args.ArchiveBaseDir, args.Target, args.Source),
 		ArchiveVersionDir: filepath.Join(args.ArchiveBaseDir, args.Target, args.Source, args.Version),
 		SvaceDir:          args.SvaceBaseDir,
+		SvaceTargetDir:    filepath.Join(args.SvaceBaseDir, args.Target),
+		SvaceSourceDir:    filepath.Join(args.SvaceBaseDir, args.Target, args.Source),
+		SvaceVersionDir:   filepath.Join(args.SvaceBaseDir, args.Target, args.Source, args.Version),
 
 	}
 }
