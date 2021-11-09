@@ -337,15 +337,46 @@ func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwor
 	log.Info("Packaging software")
 	log.Drop()
 
-	args := docker.ContainerExecArgs{
-		Name:    n.Container,
-		Cmd:     "DEB_BUILD_OPTIONS='nocheck' dpkg-buildpackage" + " " + dpkgFlags,
-		Network: withNetwork,
+	// make svace output directory
+	//err := os.MkdirAll(n.SvaceVersionDir, os.ModePerm)
+	//if err != nil {
+	//	return log.Failed(err)
+	//}
+
+	//args := docker.ContainerExecArgs{
+	//	Name:    n.Container,
+	//	Cmd:     "DEB_BUILD_OPTIONS='nocheck' svace dpkg-buildpackage" + " " + dpkgFlags,
+	//	Network: withNetwork,
+	//}
+	//err := dock.ContainerExec(args)
+	//if err != nil {
+	//	return log.Failed(err)
+	//}
+
+	args := []docker.ContainerExecArgs{
+		{
+			Name:    n.Container,
+			Cmd:     "mkdir -p " + filepath.Join(naming.ContainerSvaceDir, n.Source + "-" + n.Version),
+			Network: withNetwork,
+		}, {
+			Name:    n.Container,
+			//COLUMNS=80 for fix error "deber:error: Error response from daemon: cannot resize a stopped container: unknown"
+			Cmd:     "COLUMNS=80 svace init --bare " + filepath.Join(naming.ContainerSvaceDir, n.Source + "-" + n.Version),
+			Network: withNetwork,
+		}, {
+			Name:	 n.Container,
+			Cmd:     "COLUMNS=80 DEB_BUILD_OPTIONS='nocheck' svace build --svace-dir " + filepath.Join(naming.ContainerSvaceDir, n.Source + "-" + n.Version) + " dpkg-buildpackage " + dpkgFlags,
+			Network: withNetwork,
+		},
 	}
-	err := dock.ContainerExec(args)
-	if err != nil {
-		return log.Failed(err)
+
+	for _, arg := range args {
+		err := dock.ContainerExec(arg)
+		if err != nil {
+			return log.Failed(err)
+		}
 	}
+
 
 	return log.Done()
 }

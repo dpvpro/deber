@@ -58,14 +58,14 @@ type Naming struct {
 	ArchiveVersionDir string
 	// SvaceDir is an absolute path where svace dir is stored
 	SvaceDir string
-	// ArchiveTargetDir is an absolute path where
-	// all built packages for given target are stored
+	// SvaceTargetDir is an absolute path where
+	// all svace info for given target are stored
 	SvaceTargetDir string
-	// ArchiveSourceDir is an absolute path where
-	// all built packages for given source are stored
+	// SvaceSourceDir is an absolute path where
+	// all svace info for given source are stored
 	SvaceSourceDir string
-	// ArchiveVersionDir is an absolute path where
-	// all built packages for given source version are stored
+	// SvaceVersionDir is an absolute path where
+	// all svace info for given source version are stored
 	SvaceVersionDir string
 
 }
