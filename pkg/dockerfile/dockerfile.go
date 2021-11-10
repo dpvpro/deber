@@ -36,7 +36,7 @@ RUN rm -f /etc/apt/sources.list && \
 	echo 'deb http://192.168.11.118/ bullseye main' | tee /etc/apt/sources.list && \
 	echo 'deb-src http://192.168.11.118/ bullseye main' | tee -a /etc/apt/sources.list && \
 	apt-get update --allow-insecure-repositories && \
-	apt-get install wget gnupg2 tar bzip2 mc htop -y --allow-unauthenticated && \
+	apt-get install wget gnupg2 tar bzip2 mc htop strace -y --allow-unauthenticated && \
 	wget -qO - http://192.168.11.118/veil-repo-key.gpg | apt-key add -
 
 

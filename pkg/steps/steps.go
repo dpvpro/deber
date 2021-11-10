@@ -356,16 +356,16 @@ func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwor
 	args := []docker.ContainerExecArgs{
 		{
 			Name:    n.Container,
-			Cmd:     "mkdir -p " + filepath.Join(naming.ContainerSvaceDir, n.Source + "-" + n.Version),
+			Cmd:     "mkdir -p " + filepath.Join(naming.ContainerSvaceDir, n.Source + "_" + n.Version),
 			Network: withNetwork,
 		}, {
 			Name:    n.Container,
 			//COLUMNS=80 for fix error "deber:error: Error response from daemon: cannot resize a stopped container: unknown"
-			Cmd:     "COLUMNS=80 svace init --bare " + filepath.Join(naming.ContainerSvaceDir, n.Source + "-" + n.Version),
+			Cmd:     "COLUMNS=80 svace init --bare " + filepath.Join(naming.ContainerSvaceDir, n.Source + "_" + n.Version),
 			Network: withNetwork,
 		}, {
 			Name:	 n.Container,
-			Cmd:     "COLUMNS=80 DEB_BUILD_OPTIONS='nocheck' svace build --svace-dir " + filepath.Join(naming.ContainerSvaceDir, n.Source + "-" + n.Version) + " dpkg-buildpackage " + dpkgFlags,
+			Cmd:     "COLUMNS=80 DEB_BUILD_OPTIONS='nocheck' svace build --svace-dir " + filepath.Join(naming.ContainerSvaceDir, n.Source + "_" + n.Version) + " dpkg-buildpackage " + dpkgFlags + "; if [[ $? -eq 0 || $? -eq 255 ]]; then true; else false; fi",
 			Network: withNetwork,
 		},
 	}
