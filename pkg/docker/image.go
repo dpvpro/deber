@@ -4,17 +4,21 @@ import (
 	"archive/tar"
 	"bytes"
 	"errors"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/pkg/jsonmessage"
-	"github.com/docker/docker/pkg/term"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/pkg/jsonmessage"
+	"github.com/moby/term"
 )
 
 // IsImageBuilt function check if image with given name is built.
 func (docker *Docker) IsImageBuilt(name string) (bool, error) {
-	list, err := docker.cli.ImageList(docker.ctx, types.ImageListOptions{})
+	// list, err := docker.cli.ImageList(docker.ctx, types.ImageListOptions{})
+	list, err := docker.cli.ImageList(docker.ctx, image.ListOptions{})
+
 	if err != nil {
 		return false, err
 	}
@@ -97,7 +101,7 @@ func (docker *Docker) ImageBuild(name string, dockerFile []byte) error {
 // ImageList returns a list of images that match passed criteria.
 func (docker *Docker) ImageList(prefix string) ([]string, error) {
 	images := make([]string, 0)
-	options := types.ImageListOptions{
+	options := image.ListOptions{
 		All: true,
 	}
 
@@ -121,10 +125,12 @@ func (docker *Docker) ImageList(prefix string) ([]string, error) {
 
 // ImageRemove function removes image with given name.
 func (docker *Docker) ImageRemove(name string) error {
-	options := types.ImageRemoveOptions{
+	// options := types.ImageRemoveOptions{
+	// 	PruneChildren: true,
+	// }
+	options := image.RemoveOptions{
 		PruneChildren: true,
 	}
-
 	_, err := docker.cli.ImageRemove(docker.ctx, name, options)
 	if err != nil {
 		return err

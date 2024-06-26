@@ -2,22 +2,25 @@ package docker
 
 import (
 	"errors"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/pkg/term"
 	"io"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
+	// "time"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	// "github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/mount"
+	// "github.com/docker/docker/libnetwork/options"
+	"github.com/moby/term"
 )
 
 const (
 	// ContainerStopTimeout constant represents how long Docker Engine
 	// will wait for container before stopping it
-	ContainerStopTimeout = time.Millisecond * 10
+	ContainerStopTimeout = 2
 
 	// ContainerStateRunning constants defines that container is running
 	ContainerStateRunning = "running"
@@ -57,7 +60,7 @@ type ContainerExecArgs struct {
 // IsContainerCreated function checks if container is created
 // or simply just exists.
 func (docker *Docker) IsContainerCreated(name string) (bool, error) {
-	list, err := docker.cli.ContainerList(docker.ctx, types.ContainerListOptions{All: true})
+	list, err := docker.cli.ContainerList(docker.ctx, container.ListOptions{All: true})
 	if err != nil {
 		return false, err
 	}
@@ -76,7 +79,7 @@ func (docker *Docker) IsContainerCreated(name string) (bool, error) {
 // IsContainerStarted function checks
 // if container's state == ContainerStateRunning.
 func (docker *Docker) IsContainerStarted(name string) (bool, error) {
-	list, err := docker.cli.ContainerList(docker.ctx, types.ContainerListOptions{All: true})
+	list, err := docker.cli.ContainerList(docker.ctx, container.ListOptions{All: true})
 	if err != nil {
 		return false, err
 	}
@@ -97,7 +100,7 @@ func (docker *Docker) IsContainerStarted(name string) (bool, error) {
 // IsContainerStopped function checks
 // if container's state != ContainerStateRunning.
 func (docker *Docker) IsContainerStopped(name string) (bool, error) {
-	list, err := docker.cli.ContainerList(docker.ctx, types.ContainerListOptions{All: true})
+	list, err := docker.cli.ContainerList(docker.ctx, container.ListOptions{All: true})
 	if err != nil {
 		return false, err
 	}
@@ -127,7 +130,7 @@ func (docker *Docker) ContainerCreate(args ContainerCreateArgs) error {
 		User:  args.User,
 	}
 
-	_, err := docker.cli.ContainerCreate(docker.ctx, config, hostConfig, nil, args.Name)
+	_, err := docker.cli.ContainerCreate(docker.ctx, config, hostConfig, nil, nil, args.Name)
 	if err != nil {
 		return err
 	}
@@ -137,9 +140,8 @@ func (docker *Docker) ContainerCreate(args ContainerCreateArgs) error {
 
 // ContainerStart function starts container, just that.
 func (docker *Docker) ContainerStart(name string) error {
-	options := types.ContainerStartOptions{}
-
-	return docker.cli.ContainerStart(docker.ctx, name, options)
+	options := container.StartOptions{}
+	return docker.cli.ContainerStart(docker.ctx, name, options )
 }
 
 // ContainerStop function stops container, just that.
@@ -147,14 +149,15 @@ func (docker *Docker) ContainerStart(name string) error {
 // It utilizes ContainerStopTimeout constant.
 func (docker *Docker) ContainerStop(name string) error {
 	timeout := ContainerStopTimeout
+	options := container.StopOptions{Timeout: &timeout}
 
-	return docker.cli.ContainerStop(docker.ctx, name, &timeout)
+	return docker.cli.ContainerStop(docker.ctx, name, options)
 }
 
 // ContainerRemove function removes container, just that.
 func (docker *Docker) ContainerRemove(name string) error {
-	options := types.ContainerRemoveOptions{}
-
+	// options := types.ContainerRemoveOptions{}
+	options := container.RemoveOptions{}
 	return docker.cli.ContainerRemove(docker.ctx, name, options)
 }
 
@@ -284,9 +287,14 @@ func (docker *Docker) ContainerExecResize(execID string, fd uintptr) error {
 		return err
 	}
 
-	options := types.ResizeOptions{
-		Height: uint(winSize.Height),
-		Width:  uint(winSize.Width),
+	// options := types.ResizeOptions{
+	// 	Height: uint(winSize.Height),
+	// 	Width:  uint(winSize.Width),
+	// }
+
+	options := container.ResizeOptions{
+  	Height: uint(winSize.Height),
+  	Width:  uint(winSize.Width),
 	}
 
 	err = docker.cli.ContainerExecResize(docker.ctx, execID, options)
@@ -328,7 +336,7 @@ func (docker *Docker) ContainerNetwork(name string, wantConnected bool) error {
 // ContainerList returns a list of containers that match passed criteria.
 func (docker *Docker) ContainerList(prefix string) ([]string, error) {
 	containers := make([]string, 0)
-	options := types.ContainerListOptions{
+	options := container.ListOptions{
 		All: true,
 	}
 

@@ -3,6 +3,8 @@ package docker
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/docker/docker/client"
 )
 
@@ -24,6 +26,8 @@ func New() (*Docker, error) {
 		return nil, err
 	}
 
+	fmt.Println("cli - ", cli)
+	fmt.Println("docker new  - ", &Docker{ cli: cli, ctx: context.Background(), })
 	return &Docker{
 		cli: cli,
 		ctx: context.Background(),

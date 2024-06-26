@@ -63,23 +63,27 @@ func run(cmd *cobra.Command, args []string) error {
 
 	dock, err := docker.New()
 	if err != nil {
-		return err
+		// return err
+		panic(err)
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return err
+		// return err
+		panic(err)
 	}
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return err
+		// return err
+		panic(err)
 	}
 
 	path := filepath.Join(cwd, "debian/changelog")
 	ch, err := changelog.ParseFileOne(path)
 	if err != nil {
-		return err
+		// return err
+		panic(err)
 	}
 
 	if *distribution == "" {
@@ -99,19 +103,23 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 	n := naming.New(namingArgs)
 
+
 	err = steps.Build(dock, n, *age)
 	if err != nil {
-		return err
+		// return err
+		panic(err)
 	}
 
 	err = steps.Create(dock, n, *packages)
 	if err != nil {
-		return err
+		// return err
+		panic(err)
 	}
 
 	err = steps.Start(dock, n)
 	if err != nil {
-		return err
+		// return err
+		panic(err)
 	}
 
 	if *shell {
