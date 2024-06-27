@@ -209,6 +209,18 @@ type Info struct {
 	Managers       int `json:",omitempty"`
 
 	Cluster *ClusterInfo `json:",omitempty"`
+
+	Warnings []string `json:",omitempty"`
+}
+
+// Status provides information about the current swarm status and role,
+// obtained from the "Swarm" header in the API response.
+type Status struct {
+	// NodeState represents the state of the node.
+	NodeState LocalNodeState
+
+	// ControlAvailable indicates if the node is a swarm manager.
+	ControlAvailable bool
 }
 
 // Peer represents a peer.
