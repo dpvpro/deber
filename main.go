@@ -103,7 +103,6 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 	n := naming.New(namingArgs)
 
-
 	err = steps.Build(dock, n, *age)
 	if err != nil {
 		// return err

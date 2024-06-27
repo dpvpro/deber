@@ -3,14 +3,13 @@ package docker
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/docker/docker/client"
 )
 
 const (
 	// APIVersion constant is the minimum supported version of Docker Engine API
-	APIVersion = "1.30"
+	APIVersion = "1.40"
 )
 
 // Docker struct represents Docker client.
@@ -26,8 +25,6 @@ func New() (*Docker, error) {
 		return nil, err
 	}
 
-	fmt.Println("cli - ", cli)
-	fmt.Println("docker new  - ", &Docker{ cli: cli, ctx: context.Background(), })
 	return &Docker{
 		cli: cli,
 		ctx: context.Background(),

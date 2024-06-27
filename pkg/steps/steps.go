@@ -32,12 +32,14 @@ func Build(dock *docker.Docker, n *naming.Naming, maxAge time.Duration) error {
 
 	isImageBuilt, err := dock.IsImageBuilt(n.Image)
 	if err != nil {
-		return log.Failed(err)
+	 panic(err)
+		// return log.Failed(err)
 	}
 	if isImageBuilt {
 		age, err := dock.ImageAge(n.Image)
 		if err != nil {
-			return log.Failed(err)
+		  panic(err)
+			// return log.Failed(err)
 		}
 
 		if age < maxAge {
@@ -48,12 +50,14 @@ func Build(dock *docker.Docker, n *naming.Naming, maxAge time.Duration) error {
 	repos := []string{"debian", "ubuntu"}
 	repo, err := dockerhub.MatchRepo(repos, n.Target)
 	if err != nil {
-		return log.Failed(err)
+    panic(err)
+    // return log.Failed(err)
 	}
 
 	dockerFile, err := dockerfile.Parse(repo, n.Target)
 	if err != nil {
-		return log.Failed(err)
+	   panic(err)
+     // return log.Failed(err)
 	}
 
 	log.Drop()

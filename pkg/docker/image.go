@@ -4,12 +4,13 @@ import (
 	"archive/tar"
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/moby/term"
 )
@@ -28,6 +29,7 @@ func (docker *Docker) IsImageBuilt(name string) (bool, error) {
 			if list[i].RepoTags[j] == name {
 				return true, nil
 			}
+			fmt.Println("repo tag -", list[i].RepoTags[j])
 		}
 	}
 
