@@ -3,7 +3,7 @@ package dockerfile
 
 import (
 	"bytes"
-	"github.com/dawidd6/deber/pkg/naming"
+	"github.com/dpvpro/deber/pkg/naming"
 	"text/template"
 )
 

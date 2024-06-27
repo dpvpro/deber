@@ -1,9 +1,8 @@
 # deber
 
-![](https://github.com/dawidd6/deber/workflows/Tests/badge.svg)
-[![GoDoc](https://godoc.org/github.com/dawidd6/deber?status.svg)](https://godoc.org/github.com/dawidd6/deber)
-[![go report card](https://goreportcard.com/badge/github.com/dawidd6/deber)](https://goreportcard.com/report/github.com/dawidd6/deber)
-[![latest tag](https://img.shields.io/github/tag-date/dawidd6/deber.svg)](https://github.com/dawidd6/deber/releases/latest)
+![](https://github.com/dpvpro/deber/workflows/Tests/badge.svg)
+[![GoDoc](https://godoc.org/github.com/dpvpro/deber?status.svg)](https://godoc.org/github.com/dpvpro/deber)
+[![go report card](https://goreportcard.com/badge/github.com/dpvpro/deber)](https://goreportcard.com/report/github.com/dpvpro/deber)
 
 ### `Debian` **+** `Docker` **=** `deber`
 
@@ -47,7 +46,7 @@ brew install dawidd6/tap/deber
 **Source (latest master)**
 
 ```bash
-go get -u github.com/dawidd6/deber
+go get -u github.com/dpvpro/deber
 ```
 
 ## Usage

@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/dawidd6/deber/pkg/docker"
-	"github.com/dawidd6/deber/pkg/log"
-	"github.com/dawidd6/deber/pkg/naming"
-	"github.com/dawidd6/deber/pkg/steps"
+	"github.com/dpvpro/deber/pkg/docker"
+	"github.com/dpvpro/deber/pkg/log"
+	"github.com/dpvpro/deber/pkg/naming"
+	"github.com/dpvpro/deber/pkg/steps"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"os"
@@ -18,7 +18,7 @@ const (
 	// Program is the name of program
 	Program = "deber"
 	// Version of program
-	Version = "1.1.1"
+	Version = "2.0.0"
 	// Description of program
 	Description = "Debian packaging with Docker."
 )

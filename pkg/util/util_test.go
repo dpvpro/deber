@@ -1,7 +1,7 @@
 package util_test
 
 import (
-	"github.com/dawidd6/deber/pkg/util"
+	"github.com/dpvpro/deber/pkg/util"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/stretchr/testify/assert"
 	"testing"

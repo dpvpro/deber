@@ -8,8 +8,8 @@ Build-Depends:
  dh-golang,
  golang-any,
 Standards-Version: 4.4.0
-Homepage: https://github.com/dawidd6/deber
-XS-Go-Import-Path: github.com/dawidd6/deber
+Homepage: https://github.com/dpvpro/deber
+XS-Go-Import-Path: github.com/dpvpro/deber
 Testsuite: autopkgtest-pkg-go
 
 Package: deber
