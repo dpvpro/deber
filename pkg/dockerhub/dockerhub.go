@@ -8,16 +8,7 @@ import (
 	"io"
 	"net/http"
 	"github.com/thedevsaddam/gojsonq"
-
-
 )
-
-// Tag struct represents single JSON object received from
-// DockerHub API after querying it for list of tags for particular repository.
-// type Tag struct {
-// 	Layer string
-// 	Name  string
-// }
 
 // GetTags function queries DockerHub API for a list of all
 // available tags of a given repository.
@@ -45,20 +36,6 @@ func GetTags(repo string) ([]string, error) {
 		return nil, err
 	}
 
-	// err = json.Unmarshal(bytes, tags)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-
-	// var jsonRaw interface{}
-  //  err = json.Unmarshal(bytes, &jsonRaw)
-  //  if err != nil {
-  //      return nil, err
-  //  }
-  //  fmt.Print(jsonRaw)
-  //
-
  	jsonRaw := string(bytes)
 
  	jq := gojsonq.New().FromString(jsonRaw)
@@ -71,12 +48,11 @@ func GetTags(repo string) ([]string, error) {
 		return nil, err
 	}
 
-	fmt.Println(res)
-	fmt.Printf("%#v\n", res)
+	// fmt.Println(res)
+	// fmt.Printf("%#v\n", res)
 
 	tags, _ = res.StringSlice()
-	fmt.Printf("%#v\n", tags)
-
+	// fmt.Printf("%#v\n", tags)
 
 	return tags, nil
 }

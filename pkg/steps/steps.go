@@ -6,18 +6,19 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/docker/docker/api/types/mount"
 	"github.com/dpvpro/deber/pkg/docker"
 	"github.com/dpvpro/deber/pkg/dockerfile"
 	"github.com/dpvpro/deber/pkg/dockerhub"
 	"github.com/dpvpro/deber/pkg/log"
 	"github.com/dpvpro/deber/pkg/naming"
 	"github.com/dpvpro/deber/pkg/util"
-	"github.com/docker/docker/api/types/mount"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 // Build function determines parent image name by querying DockerHub API
@@ -32,14 +33,12 @@ func Build(dock *docker.Docker, n *naming.Naming, maxAge time.Duration) error {
 
 	isImageBuilt, err := dock.IsImageBuilt(n.Image)
 	if err != nil {
-	 panic(err)
-		// return log.Failed(err)
+		return log.Failed(err)
 	}
 	if isImageBuilt {
 		age, err := dock.ImageAge(n.Image)
 		if err != nil {
-		  panic(err)
-			// return log.Failed(err)
+			return log.Failed(err)
 		}
 
 		if age < maxAge {
@@ -50,14 +49,12 @@ func Build(dock *docker.Docker, n *naming.Naming, maxAge time.Duration) error {
 	repos := []string{"debian", "ubuntu"}
 	repo, err := dockerhub.MatchRepo(repos, n.Target)
 	if err != nil {
-    panic(err)
-    // return log.Failed(err)
+    return log.Failed(err)
 	}
 
 	dockerFile, err := dockerfile.Parse(repo, n.Target)
 	if err != nil {
-	   panic(err)
-     // return log.Failed(err)
+     return log.Failed(err)
 	}
 
 	log.Drop()
@@ -221,13 +218,13 @@ func Tarball(n *naming.Naming) error {
 	tarball := fmt.Sprintf("%s_%s.orig.tar", n.Source, n.Upstream)
 
 	sourceTarballs := make([]string, 0)
-	sourceFiles, err := ioutil.ReadDir(n.SourceParentDir)
+	sourceFiles, err := os.ReadDir(n.SourceParentDir)
 	if err != nil {
 		return log.Failed(err)
 	}
 
 	buildTarballs := make([]string, 0)
-	buildFiles, err := ioutil.ReadDir(n.BuildDir)
+	buildFiles, err := os.ReadDir(n.BuildDir)
 	if err != nil {
 		return log.Failed(err)
 	}
@@ -392,7 +389,7 @@ func Archive(n *naming.Naming) error {
 	}
 
 	// Read files in build directory
-	files, err := ioutil.ReadDir(n.BuildDir)
+	files, err := os.ReadDir(n.BuildDir)
 	if err != nil {
 		return log.Failed(err)
 	}
@@ -415,7 +412,7 @@ func Archive(n *naming.Naming) error {
 			return log.Failed(err)
 		}
 
-		sourceBytes, err := ioutil.ReadAll(sourceFile)
+		sourceBytes, err := io.ReadAll(sourceFile)
 		if err != nil {
 			return log.Failed(err)
 		}
@@ -433,7 +430,7 @@ func Archive(n *naming.Naming) error {
 				return log.Failed(err)
 			}
 
-			targetBytes, err := ioutil.ReadAll(targetFile)
+			targetBytes, err := io.ReadAll(targetFile)
 			if err != nil {
 				return log.Failed(err)
 			}
@@ -451,7 +448,7 @@ func Archive(n *naming.Naming) error {
 		}
 
 		// Target file doesn't exist or checksums mismatched
-		err = ioutil.WriteFile(targetPath, sourceBytes, sourceStat.Mode())
+		err = os.WriteFile(targetPath, sourceBytes, sourceStat.Mode())
 		if err != nil {
 			return log.Failed(err)
 		}

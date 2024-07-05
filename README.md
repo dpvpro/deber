@@ -37,16 +37,10 @@ Docker containers.
 
 ## Installation
 
-**Homebrew (latest tag)**
-
-```bash
-brew install dawidd6/tap/deber
-```
-
 **Source (latest master)**
 
 ```bash
-go get -u github.com/dpvpro/deber
+go install github.com/dpvpro/deber@latest
 ```
 
 ## Usage

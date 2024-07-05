@@ -4,7 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"errors"
-	"fmt"
+	// "fmt"
 	"os"
 	"strings"
 	"time"
@@ -17,19 +17,20 @@ import (
 
 // IsImageBuilt function check if image with given name is built.
 func (docker *Docker) IsImageBuilt(name string) (bool, error) {
-	// list, err := docker.cli.ImageList(docker.ctx, types.ImageListOptions{})
 	list, err := docker.cli.ImageList(docker.ctx, image.ListOptions{})
 
 	if err != nil {
 		return false, err
 	}
 
+	// fmt.Println("")
+	
 	for i := range list {
 		for j := range list[i].RepoTags {
 			if list[i].RepoTags[j] == name {
 				return true, nil
 			}
-			fmt.Println("repo tag -", list[i].RepoTags[j])
+			// fmt.Println("repo tag -", list[i].RepoTags[j])
 		}
 	}
 
