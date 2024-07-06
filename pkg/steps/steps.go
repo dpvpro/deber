@@ -383,7 +383,7 @@ func Archive(n *naming.Naming) error {
 	log.Info("Archiving build")
 
 	// Make needed directories
-	err := os.MkdirAll(n.ArchiveVersionDir, os.ModePerm)
+	err := os.MkdirAll(n.PackagesVersionDir, os.ModePerm)
 	if err != nil {
 		return log.Failed(err)
 	}
@@ -405,7 +405,7 @@ func Archive(n *naming.Naming) error {
 		log.ExtraInfo(f.Name())
 
 		sourcePath := filepath.Join(n.BuildDir, f.Name())
-		targetPath := filepath.Join(n.ArchiveVersionDir, f.Name())
+		targetPath := filepath.Join(n.PackagesVersionDir, f.Name())
 
 		sourceFile, err := os.Open(sourcePath)
 		if err != nil {

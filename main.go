@@ -25,8 +25,8 @@ const (
 )
 
 var (
-	buildDir     = pflag.StringP("build-dir", "B", "/tmp", "where to place build stuff")
-	cacheDir     = pflag.StringP("cache-dir", "C", "/tmp", "where to place cached stuff")
+	buildDir     = pflag.StringP("build-dir", "B", "", "where to place build stuff")
+	cacheDir     = pflag.StringP("cache-dir", "C", "", "where to place cached stuff")
 	distribution = pflag.StringP("distribution", "d", "", "override target distribution")
 	packages     = pflag.StringArrayP("package", "p", nil, "additional packages to be installed in container (either single .deb or a directory)")
 	age          = pflag.DurationP("age", "a", time.Hour*24*14, "time after which image will be refreshed")
@@ -77,7 +77,34 @@ func run(cmd *cobra.Command, args []string) error {
 	// 	return err
 	// }
 
-	home := os.TempDir()
+	home := filepath.Join(os.TempDir(), Program)
+	err = os.MkdirAll(home, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	source := filepath.Join(home, "sources")
+	err = os.MkdirAll(source, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+
+	if *buildDir == "" {
+		*buildDir = filepath.Join(home, "builddir")
+		err = os.MkdirAll(*buildDir, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
+	if *cacheDir == "" {
+  	*cacheDir = filepath.Join(home, "cachedir")
+  	err = os.MkdirAll(*cacheDir, os.ModePerm)
+  	if err != nil {
+  		return err
+  	}
+	}
 
 	path := filepath.Join(cwd, "debian/changelog")
 	ch, err := changelog.ParseFileOne(path)
@@ -98,7 +125,7 @@ func run(cmd *cobra.Command, args []string) error {
 		SourceBaseDir:  cwd,
 		BuildBaseDir:   *buildDir,
 		CacheBaseDir:   *cacheDir,
-		ArchiveBaseDir: filepath.Join(home, Program),
+		PackagesBaseDir: filepath.Join(home, "packages"),
 	}
 	n := naming.New(namingArgs)
 

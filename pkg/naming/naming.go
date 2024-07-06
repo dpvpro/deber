@@ -41,18 +41,18 @@ type Naming struct {
 	BuildDir string
 	// CacheDir is an absolute path where apt cache is stored
 	CacheDir string
-	// ArchiveDir is an absolute path where
+	// PackagesDir is an absolute path where
 	// all built packages are stored
-	ArchiveDir string
-	// ArchiveTargetDir is an absolute path where
+	PackagesDir string
+	// PackagesTargetDir is an absolute path where
 	// all built packages for given target are stored
-	ArchiveTargetDir string
-	// ArchiveSourceDir is an absolute path where
+	PackagesTargetDir string
+	// PackagesSourceDir is an absolute path where
 	// all built packages for given source are stored
-	ArchiveSourceDir string
-	// ArchiveVersionDir is an absolute path where
+	PackagesSourceDir string
+	// PackagesVersionDir is an absolute path where
 	// all built packages for given source version are stored
-	ArchiveVersionDir string
+	PackagesVersionDir string
 }
 
 // Args struct holds information about package base directories and prefix
@@ -75,8 +75,8 @@ type Args struct {
 	BuildBaseDir string
 	// CacheBaseDir is a directory where all cache dirs are stored
 	CacheBaseDir string
-	// ArchiveBaseDir is a directory where all build packages are stored
-	ArchiveBaseDir string
+	// PackagesBaseDir is a directory where all build packages are stored
+	PackagesBaseDir string
 }
 
 // New creates new instance of Naming struct
@@ -93,14 +93,14 @@ func New(args Args) *Naming {
 		Container: container,
 		Image:     image,
 
-		SourceDir:         args.SourceBaseDir,
-		SourceParentDir:   filepath.Dir(args.SourceBaseDir),
-		BuildDir:          filepath.Join(args.BuildBaseDir, container),
-		CacheDir:          filepath.Join(args.CacheBaseDir, image),
-		ArchiveDir:        args.ArchiveBaseDir,
-		ArchiveTargetDir:  filepath.Join(args.ArchiveBaseDir, args.Target),
-		ArchiveSourceDir:  filepath.Join(args.ArchiveBaseDir, args.Target, args.Source),
-		ArchiveVersionDir: filepath.Join(args.ArchiveBaseDir, args.Target, args.Source, args.Version),
+		SourceDir:          args.SourceBaseDir,
+		SourceParentDir:    filepath.Dir(args.SourceBaseDir),
+		BuildDir:           filepath.Join(args.BuildBaseDir, container),
+		CacheDir:           filepath.Join(args.CacheBaseDir, image),
+		PackagesDir:        args.PackagesBaseDir,
+		PackagesTargetDir:  filepath.Join(args.PackagesBaseDir, args.Target),
+		PackagesSourceDir:  filepath.Join(args.PackagesBaseDir, args.Target, args.Source),
+		PackagesVersionDir: filepath.Join(args.PackagesBaseDir, args.Target, args.Source, args.Version),
 	}
 }
 
