@@ -35,8 +35,8 @@ var (
 	dpkgFlags    = pflag.StringP("dpkg-flags", "D", "-tc", "additional flags to be passed to dpkg-buildpackage in container")
 	lintianFlags = pflag.StringP("lintian-flags", "L", "-i -I", "additional flags to be passed to lintian in container")
 	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
-	noLogColor   = pflag.BoolP("no-log-color", "c", false, "do not colorize log output")
-	noRemove     = pflag.BoolP("no-remove", "r", false, "do not remove container at the end of the process")
+	noLogColor   = pflag.BoolP("no-log-color", "", false, "do not colorize log output")
+	noRemove     = pflag.BoolP("no-remove", "", false, "do not remove container at the end of the process")
 )
 
 func main() {
