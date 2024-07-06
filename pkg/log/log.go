@@ -41,9 +41,9 @@ func Info(info string) {
 	dropped = false
 
 	if NoColor {
-		fmt.Printf("%s:info: %s ...", Prefix, info)
+		fmt.Printf("%s:info: %s ... ", Prefix, info)
 	} else {
-		fmt.Printf("%s%s:info:%s %s ...", blue, Prefix, normal, info)
+		fmt.Printf("%s%s:info:%s %s ... ", blue, Prefix, normal, info)
 	}
 }
 
@@ -59,7 +59,7 @@ func Error(err error) {
 // ExtraInfo prints given info with indent and without colors or prefix
 func ExtraInfo(info string) {
 	dropped = false
-	fmt.Printf("  %s ...", info)
+	fmt.Printf("  %s ... ", info)
 }
 
 // Skipped function prints 'skipped' and new line
