@@ -229,7 +229,7 @@ func Tarball(n *naming.Naming) error {
 	}
 
 	for _, f := range sourceFiles {
-		if strings.HasPrefix(f.Name(), tarball) {
+		if strings.HasPrefix(f.Name(), tarball) && (strings.HasSuffix(f.Name(), ".gz") || strings.HasSuffix(f.Name(), ".xz")) {
 			sourceTarballs = append(sourceTarballs, f.Name())
 		}
 	}
@@ -243,7 +243,8 @@ func Tarball(n *naming.Naming) error {
 	if len(buildTarballs) > 1 {
 		return log.Failed(errors.New("multiple tarballs found in build directory"))
 	}
-
+	
+	// fmt.Println(sourceTarballs)
 	if len(sourceTarballs) > 1 {
 		return log.Failed(errors.New("multiple tarballs found in parent source directory"))
 	}
