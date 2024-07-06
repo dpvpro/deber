@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"bytes"
 	"errors"
-	// "fmt"
 	"os"
 	"strings"
 	"time"
@@ -23,14 +22,11 @@ func (docker *Docker) IsImageBuilt(name string) (bool, error) {
 		return false, err
 	}
 
-	// fmt.Println("")
-	
 	for i := range list {
 		for j := range list[i].RepoTags {
 			if list[i].RepoTags[j] == name {
 				return true, nil
 			}
-			// fmt.Println("repo tag -", list[i].RepoTags[j])
 		}
 	}
 

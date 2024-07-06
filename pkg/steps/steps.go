@@ -63,7 +63,6 @@ func Build(dock *docker.Docker, n *naming.Naming, maxAge time.Duration) error {
 	if err != nil {
 		return log.Failed(err)
 	}
-
 	return log.Done()
 }
 
