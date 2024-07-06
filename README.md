@@ -73,7 +73,7 @@ deber -p ~/deber/unstable/pkg1/1.0.0-1 -p ~/deber/unstable/pkg2/2.0.0-2
 
 ## FAQ
 
-**Okay everything went well, but... where the hell is my `.deb`?!**
+**Ok, everything went well, but... where the hell is my `.deb`?!**
 
 The location for all build outputs defaults to `$HOME/deber`.
 I made it this way, because it was just hard to look at my parent directory,

@@ -7,10 +7,12 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+
 	// "time"
 
-	"github.com/docker/docker/api/types"
+	// "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+
 	// "github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
 	// "github.com/docker/docker/libnetwork/options"
@@ -193,7 +195,7 @@ func (docker *Docker) ContainerMounts(name string) ([]mount.Mount, error) {
 //
 // Command can be empty, in that case just bash is executed.
 func (docker *Docker) ContainerExec(args ContainerExecArgs) error {
-	config := types.ExecConfig{
+ 	config := container.ExecOptions{
 		Cmd:          []string{"bash"},
 		WorkingDir:   args.WorkDir,
 		AttachStdin:  args.Interactive,
@@ -201,7 +203,7 @@ func (docker *Docker) ContainerExec(args ContainerExecArgs) error {
 		AttachStderr: true,
 		Tty:          true,
 	}
-	check := types.ExecStartCheck{
+	check := container.ExecAttachOptions{
 		Tty:    true,
 		Detach: false,
 	}
@@ -286,11 +288,6 @@ func (docker *Docker) ContainerExecResize(execID string, fd uintptr) error {
 	if err != nil {
 		return err
 	}
-
-	// options := types.ResizeOptions{
-	// 	Height: uint(winSize.Height),
-	// 	Width:  uint(winSize.Width),
-	// }
 
 	options := container.ResizeOptions{
   	Height: uint(winSize.Height),

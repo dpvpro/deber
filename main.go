@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/dpvpro/deber/pkg/docker"
 	"github.com/dpvpro/deber/pkg/log"
 	"github.com/dpvpro/deber/pkg/naming"
 	"github.com/dpvpro/deber/pkg/steps"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"os"
-	"path/filepath"
 	"pault.ag/go/debian/changelog"
-	"time"
 )
 
 const (
@@ -63,27 +64,25 @@ func run(cmd *cobra.Command, args []string) error {
 
 	dock, err := docker.New()
 	if err != nil {
-		// return err
-		panic(err)
+		return err
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		// return err
-		panic(err)
+		return err
 	}
 
-	home, err := os.UserHomeDir()
-	if err != nil {
-		// return err
-		panic(err)
-	}
+	// home, err := os.UserHomeDir()
+	// if err != nil {
+	// 	return err
+	// }
+
+	home := os.TempDir()
 
 	path := filepath.Join(cwd, "debian/changelog")
 	ch, err := changelog.ParseFileOne(path)
 	if err != nil {
-		// return err
-		panic(err)
+		return err
 	}
 
 	if *distribution == "" {
@@ -105,20 +104,17 @@ func run(cmd *cobra.Command, args []string) error {
 
 	err = steps.Build(dock, n, *age)
 	if err != nil {
-		// return err
-		panic(err)
+		return err
 	}
 
 	err = steps.Create(dock, n, *packages)
 	if err != nil {
-		// return err
-		panic(err)
+		return err
 	}
 
 	err = steps.Start(dock, n)
 	if err != nil {
-		// return err
-		panic(err)
+		return err
 	}
 
 	if *shell {
@@ -158,6 +154,5 @@ func run(cmd *cobra.Command, args []string) error {
 	if *noRemove {
 		return nil
 	}
-
 	return steps.Remove(dock, n)
 }
