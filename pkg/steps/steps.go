@@ -348,10 +348,17 @@ func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwor
 }
 
 // Test function executes "debi", "debc" and "lintian" in container.
-func Test(dock *docker.Docker, n *naming.Naming, lintianFlags string, noLintian bool) error {
-	log.Info("Testing package")
-	log.Drop()
+func Test(dock *docker.Docker, n *naming.Naming, lintianFlags string, lintian bool) error {
 
+  log.Info("Testing package")
+
+  // skip tests
+	if !lintian {
+		return log.Skipped()
+	}
+  
+  log.Drop()
+	
 	args := []docker.ContainerExecArgs{
 		{
 			Name:    n.Container,
@@ -364,7 +371,7 @@ func Test(dock *docker.Docker, n *naming.Naming, lintianFlags string, noLintian 
 		}, {
 			Name: n.Container,
 			Cmd:  "lintian" + " " + lintianFlags,
-			Skip: noLintian,
+			Skip: !lintian,
 		},
 	}
 

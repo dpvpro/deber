@@ -34,7 +34,7 @@ var (
 	shell        = pflag.BoolP("shell", "s", false, "launch interactive shell in container")
 	dpkgFlags    = pflag.StringP("dpkg-flags", "D", "-tc", "additional flags to be passed to dpkg-buildpackage in container")
 	lintianFlags = pflag.StringP("lintian-flags", "L", "-i -I", "additional flags to be passed to lintian in container")
-	noLintian    = pflag.BoolP("no-lintian", "l", false, "don't run lintian in container")
+	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
 	noLogColor   = pflag.BoolP("no-log-color", "c", false, "do not colorize log output")
 	noRemove     = pflag.BoolP("no-remove", "r", false, "do not remove container at the end of the process")
 )
@@ -163,7 +163,7 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = steps.Test(dock, n, *lintianFlags, *noLintian)
+	err = steps.Test(dock, n, *lintianFlags, *lintian)
 	if err != nil {
 		return err
 	}
