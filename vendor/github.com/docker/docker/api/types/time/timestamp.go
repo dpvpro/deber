@@ -1,4 +1,4 @@
-package time
+package time // import "github.com/docker/docker/api/types/time"
 
 import (
 	"fmt"
@@ -82,11 +82,14 @@ func GetTimestamp(value string, reference time.Time) (string, error) {
 	}
 
 	if err != nil {
-		// if there is a `-` then it's an RFC3339 like timestamp otherwise assume unixtimestamp
+		// if there is a `-` then it's an RFC3339 like timestamp
 		if strings.Contains(value, "-") {
 			return "", err // was probably an RFC3339 like timestamp but the parser failed with an error
 		}
-		return value, nil // unixtimestamp in and out case (meaning: the value passed at the command line is already in the right format for passing to the server)
+		if _, _, err := parseTimestamp(value); err != nil {
+			return "", fmt.Errorf("failed to parse value as time or duration: %q", value)
+		}
+		return value, nil // unix timestamp in and out case (meaning: the value passed at the command line is already in the right format for passing to the server)
 	}
 
 	return fmt.Sprintf("%d.%09d", t.Unix(), int64(t.Nanosecond())), nil

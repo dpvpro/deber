@@ -1,6 +1,7 @@
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/url"
@@ -9,7 +10,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
 )
 
 // PluginUpgrade upgrades a plugin

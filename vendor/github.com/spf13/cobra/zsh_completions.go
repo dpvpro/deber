@@ -15,111 +15,66 @@
 package cobra
 
 import (
-	"encoding/json"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
-	"sort"
-	"strings"
-	"text/template"
-
-	"github.com/spf13/pflag"
 )
 
-const (
-	zshCompArgumentAnnotation   = "cobra_annotations_zsh_completion_argument_annotation"
-	zshCompArgumentFilenameComp = "cobra_annotations_zsh_completion_argument_file_completion"
-	zshCompArgumentWordComp     = "cobra_annotations_zsh_completion_argument_word_completion"
-	zshCompDirname              = "cobra_annotations_zsh_dirname"
-)
-
-var (
-	zshCompFuncMap = template.FuncMap{
-		"genZshFuncName":              zshCompGenFuncName,
-		"extractFlags":                zshCompExtractFlag,
-		"genFlagEntryForZshArguments": zshCompGenFlagEntryForArguments,
-		"extractArgsCompletions":      zshCompExtractArgumentCompletionHintsForRendering,
-	}
-	zshCompletionText = `
-{{/* should accept Command (that contains subcommands) as parameter */}}
-{{define "argumentsC" -}}
-{{ $cmdPath := genZshFuncName .}}
-function {{$cmdPath}} {
-  local -a commands
-
-  _arguments -C \{{- range extractFlags .}}
-    {{genFlagEntryForZshArguments .}} \{{- end}}
-    "1: :->cmnds" \
-    "*::arg:->args"
-
-  case $state in
-  cmnds)
-    commands=({{range .Commands}}{{if not .Hidden}}
-      "{{.Name}}:{{.Short}}"{{end}}{{end}}
-    )
-    _describe "command" commands
-    ;;
-  esac
-
-  case "$words[1]" in {{- range .Commands}}{{if not .Hidden}}
-  {{.Name}})
-    {{$cmdPath}}_{{.Name}}
-    ;;{{end}}{{end}}
-  esac
-}
-{{range .Commands}}{{if not .Hidden}}
-{{template "selectCmdTemplate" .}}
-{{- end}}{{end}}
-{{- end}}
-
-{{/* should accept Command without subcommands as parameter */}}
-{{define "arguments" -}}
-function {{genZshFuncName .}} {
-{{"  _arguments"}}{{range extractFlags .}} \
-    {{genFlagEntryForZshArguments . -}}
-{{end}}{{range extractArgsCompletions .}} \
-    {{.}}{{end}}
-}
-{{end}}
-
-{{/* dispatcher for commands with or without subcommands */}}
-{{define "selectCmdTemplate" -}}
-{{if .Hidden}}{{/* ignore hidden*/}}{{else -}}
-{{if .Commands}}{{template "argumentsC" .}}{{else}}{{template "arguments" .}}{{end}}
-{{- end}}
-{{- end}}
-
-{{/* template entry point */}}
-{{define "Main" -}}
-#compdef _{{.Name}} {{.Name}}
-
-{{template "selectCmdTemplate" .}}
-{{end}}
-`
-)
-
-// zshCompArgsAnnotation is used to encode/decode zsh completion for
-// arguments to/from Command.Annotations.
-type zshCompArgsAnnotation map[int]zshCompArgHint
-
-type zshCompArgHint struct {
-	// Indicates the type of the completion to use. One of:
-	// zshCompArgumentFilenameComp or zshCompArgumentWordComp
-	Tipe string `json:"type"`
-
-	// A value for the type above (globs for file completion or words)
-	Options []string `json:"options"`
-}
-
-// GenZshCompletionFile generates zsh completion file.
+// GenZshCompletionFile generates zsh completion file including descriptions.
 func (c *Command) GenZshCompletionFile(filename string) error {
+	return c.genZshCompletionFile(filename, true)
+}
+
+// GenZshCompletion generates zsh completion file including descriptions
+// and writes it to the passed writer.
+func (c *Command) GenZshCompletion(w io.Writer) error {
+	return c.genZshCompletion(w, true)
+}
+
+// GenZshCompletionFileNoDesc generates zsh completion file without descriptions.
+func (c *Command) GenZshCompletionFileNoDesc(filename string) error {
+	return c.genZshCompletionFile(filename, false)
+}
+
+// GenZshCompletionNoDesc generates zsh completion file without descriptions
+// and writes it to the passed writer.
+func (c *Command) GenZshCompletionNoDesc(w io.Writer) error {
+	return c.genZshCompletion(w, false)
+}
+
+// MarkZshCompPositionalArgumentFile only worked for zsh and its behavior was
+// not consistent with Bash completion. It has therefore been disabled.
+// Instead, when no other completion is specified, file completion is done by
+// default for every argument. One can disable file completion on a per-argument
+// basis by using ValidArgsFunction and ShellCompDirectiveNoFileComp.
+// To achieve file extension filtering, one can use ValidArgsFunction and
+// ShellCompDirectiveFilterFileExt.
+//
+// Deprecated
+func (c *Command) MarkZshCompPositionalArgumentFile(argPosition int, patterns ...string) error {
+	return nil
+}
+
+// MarkZshCompPositionalArgumentWords only worked for zsh. It has therefore
+// been disabled.
+// To achieve the same behavior across all shells, one can use
+// ValidArgs (for the first argument only) or ValidArgsFunction for
+// any argument (can include the first one also).
+//
+// Deprecated
+func (c *Command) MarkZshCompPositionalArgumentWords(argPosition int, words ...string) error {
+	return nil
+}
+
+func (c *Command) genZshCompletionFile(filename string, includeDesc bool) error {
 	outFile, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer outFile.Close()
 
-	return c.GenZshCompletion(outFile)
+	return c.genZshCompletion(outFile, includeDesc)
 }
 
 func (c *Command) genZshCompletion(w io.Writer, includeDesc bool) error {

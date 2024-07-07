@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 func genFishComp(buf io.StringWriter, name string, includeDesc bool) {

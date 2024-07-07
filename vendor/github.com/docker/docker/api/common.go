@@ -1,4 +1,4 @@
-package api
+package api // import "github.com/docker/docker/api"
 
 // Common constants for daemon and client.
 const (
@@ -16,5 +16,5 @@ const (
 
 	// NoBaseImageSpecifier is the symbol used by the FROM
 	// command to specify that no base image is to be used.
-	NoBaseImageSpecifier string = "scratch"
+	NoBaseImageSpecifier = "scratch"
 )

@@ -1,4 +1,4 @@
-package swarm
+package swarm // import "github.com/docker/docker/api/types/swarm"
 
 import (
 	"time"
@@ -69,6 +69,7 @@ type AppArmorOpts struct {
 
 // CredentialSpec for managed service account (Windows only)
 type CredentialSpec struct {
+	Config   string
 	File     string
 	Registry string
 }
@@ -94,6 +95,7 @@ type ContainerSpec struct {
 	User            string                  `json:",omitempty"`
 	Groups          []string                `json:",omitempty"`
 	Privileges      *Privileges             `json:",omitempty"`
+	Init            *bool                   `json:",omitempty"`
 	StopSignal      string                  `json:",omitempty"`
 	TTY             bool                    `json:",omitempty"`
 	OpenStdin       bool                    `json:",omitempty"`

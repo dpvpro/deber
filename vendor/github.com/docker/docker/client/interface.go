@@ -1,6 +1,7 @@
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
+	"context"
 	"io"
 	"net"
 	"net/http"
@@ -34,6 +35,7 @@ type CommonAPIClient interface {
 	VolumeAPIClient
 	ClientVersion() string
 	DaemonHost() string
+	HTTPClient() *http.Client
 	ServerVersion(ctx context.Context) (types.Version, error)
 	NegotiateAPIVersion(ctx context.Context)
 	NegotiateAPIVersionPing(types.Ping)

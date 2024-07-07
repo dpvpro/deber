@@ -1,16 +1,19 @@
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 
 	"github.com/docker/docker/api/types/swarm"
-	"golang.org/x/net/context"
 )
 
 // NodeInspectWithRaw returns the node information.
 func (cli *Client) NodeInspectWithRaw(ctx context.Context, nodeID string) (swarm.Node, []byte, error) {
+	if nodeID == "" {
+		return swarm.Node{}, nil, objectNotFoundError{object: "node", id: nodeID}
+	}
 	serverResp, err := cli.get(ctx, "/nodes/"+nodeID, nil, nil)
 	defer ensureReaderClosed(serverResp)
 	if err != nil {

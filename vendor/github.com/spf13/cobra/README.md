@@ -9,6 +9,7 @@ name a few. [This list](site/content/projects_using_cobra.md) contains a more ex
 [![](https://img.shields.io/github/actions/workflow/status/spf13/cobra/test.yml?branch=main&longCache=true&label=Test&logo=github%20actions&logoColor=fff)](https://github.com/spf13/cobra/actions?query=workflow%3ATest)
 [![Go Reference](https://pkg.go.dev/badge/github.com/spf13/cobra.svg)](https://pkg.go.dev/github.com/spf13/cobra)
 [![Go Report Card](https://goreportcard.com/badge/github.com/spf13/cobra)](https://goreportcard.com/report/github.com/spf13/cobra)
+[![Slack](https://img.shields.io/badge/Slack-cobra-brightgreen)](https://gophers.slack.com/archives/CD3LP1199)
 
 # Overview
 
@@ -24,7 +25,7 @@ Cobra provides:
 * Automatic help generation for commands and flags
 * Grouping help for subcommands
 * Automatic help flag recognition of `-h`, `--help`, etc.
-* Automatically generated bash autocomplete for your application
+* Automatically generated shell autocomplete for your application (bash, zsh, fish, powershell)
 * Automatically generated man pages for your application
 * Command aliases so you can change things without breaking them
 * The flexibility to define your own help, usage, etc.

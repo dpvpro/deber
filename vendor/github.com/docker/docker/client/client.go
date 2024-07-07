@@ -24,7 +24,7 @@ For example, to list running containers (the equivalent of "docker ps"):
 	)
 
 	func main() {
-		cli, err := client.NewEnvClient()
+		cli, err := client.NewClientWithOpts(client.FromEnv)
 		if err != nil {
 			panic(err)
 		}
@@ -39,7 +39,7 @@ For example, to list running containers (the equivalent of "docker ps"):
 		}
 	}
 */
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
 	"context"
@@ -47,9 +47,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
-	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -204,16 +202,9 @@ func NewClientWithOpts(ops ...Opt) (*Client, error) {
 		addr:    hostURL.Host,
 	}
 
-	if client != nil {
-		if _, ok := client.Transport.(http.RoundTripper); !ok {
-			return nil, fmt.Errorf("unable to verify TLS configuration, invalid transport %v", client.Transport)
-		}
-	} else {
-		transport := new(http.Transport)
-		sockets.ConfigureTransport(transport, hostURL.Scheme, hostURL.Host)
-		client = &http.Client{
-			Transport:     transport,
-			CheckRedirect: CheckRedirect,
+	for _, op := range ops {
+		if err := op(c); err != nil {
+			return nil, err
 		}
 	}
 

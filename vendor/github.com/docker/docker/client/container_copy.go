@@ -1,6 +1,7 @@
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -31,7 +32,7 @@ func (cli *Client) ContainerStatPath(ctx context.Context, containerID, path stri
 // Note that `content` must be a Reader for a TAR archive
 func (cli *Client) CopyToContainer(ctx context.Context, containerID, dstPath string, content io.Reader, options container.CopyToContainerOptions) error {
 	query := url.Values{}
-	query.Set("path", filepath.ToSlash(path)) // Normalize the paths used in the API.
+	query.Set("path", filepath.ToSlash(dstPath)) // Normalize the paths used in the API.
 	// Do not allow for an existing directory to be overwritten by a non-directory and vice versa.
 	if !options.AllowOverwriteDirWithFile {
 		query.Set("noOverwriteDirNonDir", "true")
@@ -41,7 +42,7 @@ func (cli *Client) CopyToContainer(ctx context.Context, containerID, dstPath str
 		query.Set("copyUIDGID", "true")
 	}
 
-	apiPath := "/containers/" + container + "/archive"
+	apiPath := "/containers/" + containerID + "/archive"
 
 	response, err := cli.putRaw(ctx, apiPath, query, content, nil)
 	defer ensureReaderClosed(response)
@@ -58,7 +59,7 @@ func (cli *Client) CopyFromContainer(ctx context.Context, containerID, srcPath s
 	query := make(url.Values, 1)
 	query.Set("path", filepath.ToSlash(srcPath)) // Normalize the paths used in the API.
 
-	apiPath := "/containers/" + container + "/archive"
+	apiPath := "/containers/" + containerID + "/archive"
 	response, err := cli.get(ctx, apiPath, query, nil)
 	if err != nil {
 		return nil, container.PathStat{}, err

@@ -1,10 +1,9 @@
-package jsonmessage
+package jsonmessage // import "github.com/docker/docker/pkg/jsonmessage"
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 	"time"
 
@@ -54,17 +53,11 @@ type JSONProgress struct {
 
 func (p *JSONProgress) String() string {
 	var (
-		width       = 200
+		width       = p.width()
 		pbBox       string
 		numbersBox  string
 		timeLeftBox string
 	)
-
-	ws, err := term.GetWinsize(p.terminalFd)
-	if err == nil {
-		width = int(ws.Width)
-	}
-
 	if p.Current <= 0 && p.Total <= 0 {
 		return ""
 	}
@@ -112,7 +105,7 @@ func (p *JSONProgress) String() string {
 	}
 
 	if p.Current > 0 && p.Start > 0 && percentage < 50 {
-		fromStart := time.Now().UTC().Sub(time.Unix(p.Start, 0))
+		fromStart := p.now().Sub(time.Unix(p.Start, 0))
 		perEntry := fromStart / time.Duration(p.Current)
 		left := time.Duration(p.Total-p.Current) * perEntry
 		left = (left / time.Second) * time.Second
@@ -164,32 +157,18 @@ type JSONMessage struct {
 	Aux *json.RawMessage `json:"aux,omitempty"`
 }
 
-/* Satisfied by gotty.TermInfo as well as noTermInfo from below */
-type termInfo interface {
-	Parse(attr string, params ...interface{}) (string, error)
+func clearLine(out io.Writer) {
+	eraseMode := aec.EraseModes.All
+	cl := aec.EraseLine(eraseMode)
+	fmt.Fprint(out, cl)
 }
 
-type noTermInfo struct{} // canary used when no terminfo.
-
-func (ti *noTermInfo) Parse(attr string, params ...interface{}) (string, error) {
-	return "", fmt.Errorf("noTermInfo")
+func cursorUp(out io.Writer, l uint) {
+	fmt.Fprint(out, aec.Up(l))
 }
 
-func clearLine(out io.Writer, ti termInfo) {
-	// el2 (clear whole line) is not exposed by terminfo.
-
-	// First clear line from beginning to cursor
-	if attr, err := ti.Parse("el1"); err == nil {
-		fmt.Fprintf(out, "%s", attr)
-	} else {
-		fmt.Fprintf(out, "\x1b[1K")
-	}
-	// Then clear line from cursor to end
-	if attr, err := ti.Parse("el"); err == nil {
-		fmt.Fprintf(out, "%s", attr)
-	} else {
-		fmt.Fprintf(out, "\x1b[K")
-	}
+func cursorDown(out io.Writer, l uint) {
+	fmt.Fprint(out, aec.Down(l))
 }
 
 // Display prints the JSONMessage to out. If isTerminal is true, it erases
@@ -200,8 +179,8 @@ func (jm *JSONMessage) Display(out io.Writer, isTerminal bool) error {
 		return jm.Error
 	}
 	var endl string
-	if termInfo != nil && jm.Stream == "" && jm.Progress != nil {
-		clearLine(out, termInfo)
+	if isTerminal && jm.Stream == "" && jm.Progress != nil {
+		clearLine(out)
 		endl = "\r"
 		fmt.Fprint(out, endl)
 	} else if jm.Progress != nil && jm.Progress.String() != "" { // disable progressbar in non-terminal
@@ -218,7 +197,7 @@ func (jm *JSONMessage) Display(out io.Writer, isTerminal bool) error {
 	if jm.From != "" {
 		fmt.Fprintf(out, "(from %s) ", jm.From)
 	}
-	if jm.Progress != nil && termInfo != nil {
+	if jm.Progress != nil && isTerminal {
 		fmt.Fprintf(out, "%s %s%s", jm.Status, jm.Progress.String(), endl)
 	} else if jm.ProgressMessage != "" { // deprecated
 		fmt.Fprintf(out, "%s %s%s", jm.Status, jm.ProgressMessage, endl)
@@ -249,25 +228,11 @@ func (jm *JSONMessage) Display(out io.Writer, isTerminal bool) error {
 func DisplayJSONMessagesStream(in io.Reader, out io.Writer, terminalFd uintptr, isTerminal bool, auxCallback func(JSONMessage)) error {
 	var (
 		dec = json.NewDecoder(in)
-		ids = make(map[string]int)
+		ids = make(map[string]uint)
 	)
 
-	var termInfo termInfo
-
-	if isTerminal {
-		term := os.Getenv("TERM")
-		if term == "" {
-			term = "vt102"
-		}
-
-		var err error
-		if termInfo, err = gotty.OpenTermInfo(term); err != nil {
-			termInfo = &noTermInfo{}
-		}
-	}
-
 	for {
-		diff := 0
+		var diff uint
 		var jm JSONMessage
 		if err := dec.Decode(&jm); err != nil {
 			if err == io.EOF {
@@ -278,7 +243,7 @@ func DisplayJSONMessagesStream(in io.Reader, out io.Writer, terminalFd uintptr, 
 
 		if jm.Aux != nil {
 			if auxCallback != nil {
-				auxCallback(jm.Aux)
+				auxCallback(jm)
 			}
 			continue
 		}
@@ -295,15 +260,15 @@ func DisplayJSONMessagesStream(in io.Reader, out io.Writer, terminalFd uintptr, 
 				// when we output something that's not
 				// accounted for in the map, such as a line
 				// with no ID.
-				line = len(ids)
+				line = uint(len(ids))
 				ids[jm.ID] = line
-				if termInfo != nil {
+				if isTerminal {
 					fmt.Fprintf(out, "\n")
 				}
 			}
-			diff = len(ids) - line
-			if termInfo != nil {
-				cursorUp(out, termInfo, diff)
+			diff = uint(len(ids)) - line
+			if isTerminal {
+				cursorUp(out, diff)
 			}
 		} else {
 			// When outputting something that isn't progress
@@ -311,11 +276,11 @@ func DisplayJSONMessagesStream(in io.Reader, out io.Writer, terminalFd uintptr, 
 			// don't want progress entries from some previous
 			// operation to be updated (for example, pull -a
 			// with multiple tags).
-			ids = make(map[string]int)
+			ids = make(map[string]uint)
 		}
-		err := jm.Display(out, termInfo)
-		if jm.ID != "" && termInfo != nil {
-			cursorDown(out, termInfo, diff)
+		err := jm.Display(out, isTerminal)
+		if jm.ID != "" && isTerminal {
+			cursorDown(out, diff)
 		}
 		if err != nil {
 			return err

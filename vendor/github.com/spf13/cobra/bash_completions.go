@@ -76,6 +76,12 @@ __%[1]s_handle_go_custom_completion()
 {
     __%[1]s_debug "${FUNCNAME[0]}: cur is ${cur}, words[*] is ${words[*]}, #words[@] is ${#words[@]}"
 
+    local shellCompDirectiveError=%[3]d
+    local shellCompDirectiveNoSpace=%[4]d
+    local shellCompDirectiveNoFileComp=%[5]d
+    local shellCompDirectiveFilterFileExt=%[6]d
+    local shellCompDirectiveFilterDirs=%[7]d
+
     local out requestComp lastParam lastChar comp directive args
 
     # Prepare the command to request completions for the program.
@@ -110,23 +116,24 @@ __%[1]s_handle_go_custom_completion()
     __%[1]s_debug "${FUNCNAME[0]}: the completion directive is: ${directive}"
     __%[1]s_debug "${FUNCNAME[0]}: the completions are: ${out}"
 
-    if [ $((directive & %[3]d)) -ne 0 ]; then
+    if [ $((directive & shellCompDirectiveError)) -ne 0 ]; then
         # Error code.  No completion.
         __%[1]s_debug "${FUNCNAME[0]}: received error from custom completion go code"
         return
     else
-        if [ $((directive & %[4]d)) -ne 0 ]; then
+        if [ $((directive & shellCompDirectiveNoSpace)) -ne 0 ]; then
             if [[ $(type -t compopt) = "builtin" ]]; then
                 __%[1]s_debug "${FUNCNAME[0]}: activating no space"
                 compopt -o nospace
             fi
         fi
-        if [ $((directive & %[5]d)) -ne 0 ]; then
+        if [ $((directive & shellCompDirectiveNoFileComp)) -ne 0 ]; then
             if [[ $(type -t compopt) = "builtin" ]]; then
                 __%[1]s_debug "${FUNCNAME[0]}: activating no file completion"
                 compopt +o default
             fi
         fi
+    fi
 
     if [ $((directive & shellCompDirectiveFilterFileExt)) -ne 0 ]; then
         # File extension filtering
@@ -227,10 +234,9 @@ __%[1]s_handle_reply()
     local completions
     completions=("${commands[@]}")
     if [[ ${#must_have_one_noun[@]} -ne 0 ]]; then
-        completions=("${must_have_one_noun[@]}")
+        completions+=("${must_have_one_noun[@]}")
     elif [[ -n "${has_completion_function}" ]]; then
         # if a go completion function is provided, defer to that function
-        completions=()
         __%[1]s_handle_go_custom_completion
     fi
     if [[ ${#must_have_one_flag[@]} -ne 0 ]]; then
@@ -441,7 +447,7 @@ fi
 func writeCommands(buf io.StringWriter, cmd *Command) {
 	WriteStringAndCheck(buf, "    commands=()\n")
 	for _, c := range cmd.Commands() {
-		if !c.IsAvailableCommand() || c == cmd.helpCommand {
+		if !c.IsAvailableCommand() && c != cmd.helpCommand {
 			continue
 		}
 		WriteStringAndCheck(buf, fmt.Sprintf("    commands+=(%q)\n", c.Name()))
@@ -565,7 +571,9 @@ func writeFlags(buf io.StringWriter, cmd *Command) {
 		if len(flag.Shorthand) > 0 {
 			writeShortFlag(buf, flag, cmd)
 		}
-		if localNonPersistentFlags.Lookup(flag.Name) != nil {
+		// localNonPersistentFlags are used to stop the completion of subcommands when one is set
+		// if TraverseChildren is true we should allow to complete subcommands
+		if localNonPersistentFlags.Lookup(flag.Name) != nil && !cmd.Root().TraverseChildren {
 			writeLocalNonPersistentFlag(buf, flag)
 		}
 	})
@@ -643,7 +651,7 @@ func writeArgAliases(buf io.StringWriter, cmd *Command) {
 
 func gen(buf io.StringWriter, cmd *Command) {
 	for _, c := range cmd.Commands() {
-		if !c.IsAvailableCommand() || c == cmd.helpCommand {
+		if !c.IsAvailableCommand() && c != cmd.helpCommand {
 			continue
 		}
 		gen(buf, c)

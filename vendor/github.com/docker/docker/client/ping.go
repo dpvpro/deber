@@ -1,6 +1,8 @@
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
+	"context"
+	"net/http"
 	"path"
 	"strings"
 

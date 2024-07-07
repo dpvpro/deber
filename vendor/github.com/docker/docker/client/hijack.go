@@ -1,4 +1,4 @@
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
 	"bufio"
@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -15,21 +14,6 @@ import (
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
-
-// tlsClientCon holds tls information and a dialed connection.
-type tlsClientCon struct {
-	*tls.Conn
-	rawConn net.Conn
-}
-
-func (c *tlsClientCon) CloseWrite() error {
-	// Go standard tls.Conn doesn't provide the CloseWrite() method so we do it
-	// on its underlying connection.
-	if conn, ok := c.rawConn.(types.CloseWriter); ok {
-		return conn.CloseWrite()
-	}
-	return nil
-}
 
 // postHijacked sends a POST request and hijacks the connection.
 func (cli *Client) postHijacked(ctx context.Context, path string, query url.Values, body interface{}, headers map[string][]string) (types.HijackedResponse, error) {
@@ -66,7 +50,8 @@ func (cli *Client) setupHijackConn(req *http.Request, proto string) (_ net.Conn,
 	req.Header.Set("Connection", "Upgrade")
 	req.Header.Set("Upgrade", proto)
 
-	conn, err := dial(cli.proto, cli.addr, resolveTLSConfig(cli.client.Transport))
+	dialer := cli.Dialer()
+	conn, err := dialer(ctx)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "cannot connect to the Docker daemon. Is 'docker daemon' running on this host?")
 	}
@@ -120,6 +105,10 @@ func (cli *Client) setupHijackConn(req *http.Request, proto string) (_ net.Conn,
 	return conn, mediaType, nil
 }
 
+// hijackedConn wraps a net.Conn and is returned by setupHijackConn in the case
+// that a) there was already buffered data in the http layer when Hijack() was
+// called, and b) the underlying net.Conn does *not* implement CloseWrite().
+// hijackedConn does not implement CloseWrite() either.
 type hijackedConn struct {
 	net.Conn
 	r *bufio.Reader
@@ -134,4 +123,19 @@ func (c *hijackedConn) RoundTrip(req *http.Request) (*http.Response, error) {
 
 func (c *hijackedConn) Read(b []byte) (int, error) {
 	return c.r.Read(b)
+}
+
+// hijackedConnCloseWriter is a hijackedConn which additionally implements
+// CloseWrite().  It is returned by setupHijackConn in the case that a) there
+// was already buffered data in the http layer when Hijack() was called, and b)
+// the underlying net.Conn *does* implement CloseWrite().
+type hijackedConnCloseWriter struct {
+	*hijackedConn
+}
+
+var _ types.CloseWriter = &hijackedConnCloseWriter{}
+
+func (c *hijackedConnCloseWriter) CloseWrite() error {
+	conn := c.Conn.(types.CloseWriter)
+	return conn.CloseWrite()
 }

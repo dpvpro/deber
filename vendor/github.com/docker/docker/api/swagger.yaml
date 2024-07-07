@@ -181,6 +181,7 @@ definitions:
       IP:
         type: "string"
         format: "ip-address"
+        description: "Host IP address that the container's port is mapped to"
       PrivatePort:
         type: "integer"
         format: "uint16"
@@ -193,7 +194,7 @@ definitions:
       Type:
         type: "string"
         x-nullable: false
-        enum: ["tcp", "udp"]
+        enum: ["tcp", "udp", "sctp"]
     example:
       PrivatePort: 8080
       PublicPort: 80
@@ -664,6 +665,7 @@ definitions:
           to not change.
         type: "integer"
         format: "int64"
+        x-nullable: true
       Ulimits:
         description: |
           A list of resource limits to set in the container. For example:
@@ -1241,7 +1243,7 @@ definitions:
         description: |
           An object mapping ports to an empty object in the form:
 
-          `{"<port>/<tcp|udp>": {}}`
+          `{"<port>/<tcp|udp|sctp>": {}}`
         type: "object"
         x-nullable: true
         additionalProperties:
@@ -1302,12 +1304,11 @@ definitions:
           An object mapping mount point paths inside the container to empty
           objects.
         type: "object"
-        properties:
-          additionalProperties:
-            type: "object"
-            enum:
-              - {}
-            default: {}
+        additionalProperties:
+          type: "object"
+          enum:
+            - {}
+          default: {}
       WorkingDir:
         description: "The working directory for commands to run in."
         type: "string"
@@ -1876,8 +1877,8 @@ definitions:
       container's port-number and protocol as key in the format `<port>/<protocol>`,
       for example, `80/udp`.
 
-      If a container's port is mapped for both `tcp` and `udp`, two separate
-      entries are added to the mapping table.
+      If a container's port is mapped for multiple protocols, separate entries
+      are added to the mapping table.
     type: "object"
     additionalProperties:
       type: "array"
@@ -2784,6 +2785,8 @@ definitions:
   CreateImageInfo:
     type: "object"
     properties:
+      id:
+        type: "string"
       error:
         type: "string"
       errorDetail:
@@ -2818,9 +2821,9 @@ definitions:
   ProgressDetail:
     type: "object"
     properties:
-      code:
+      current:
         type: "integer"
-      message:
+      total:
         type: "integer"
 
   ErrorResponse:
@@ -3164,6 +3167,13 @@ definitions:
                 type: "string"
                 x-nullable: false
                 example: "plugins.sock"
+              ProtocolScheme:
+                type: "string"
+                example: "some.protocol/v1.0"
+                description: "Protocol to use for clients connecting to the plugin."
+                enum:
+                  - ""
+                  - "moby.plugins.http/v1"
           Entrypoint:
             type: "array"
             items:
@@ -3819,7 +3829,15 @@ definitions:
     properties:
       PluginSpec:
         type: "object"
-        description: "Invalid when specified with `ContainerSpec`. *(Experimental release only.)*"
+        description: |
+          Plugin spec for the service.  *(Experimental release only.)*
+
+          <p><br /></p>
+
+          > **Note**: ContainerSpec, NetworkAttachmentSpec, and PluginSpec are
+          > mutually exclusive. PluginSpec is only used when the Runtime field
+          > is set to `plugin`. NetworkAttachmentSpec is used when the Runtime
+          > field is set to `attachment`.
         properties:
           Name:
             description: "The name or 'alias' to use for the plugin."
@@ -3836,7 +3854,15 @@ definitions:
               $ref: "#/definitions/PluginPrivilege"
       ContainerSpec:
         type: "object"
-        description: "Invalid when specified with `PluginSpec`."
+        description: |
+          Container spec for the service.
+
+          <p><br /></p>
+
+          > **Note**: ContainerSpec, NetworkAttachmentSpec, and PluginSpec are
+          > mutually exclusive. PluginSpec is only used when the Runtime field
+          > is set to `plugin`. NetworkAttachmentSpec is used when the Runtime
+          > field is set to `attachment`.
         properties:
           Image:
             description: "The image name to use for the container"
@@ -3902,6 +3928,7 @@ definitions:
                       > and `CredentialSpec.Config` are mutually exclusive.
                   File:
                     type: "string"
+                    example: "spec.json"
                     description: |
                       Load credential spec from this file. The file is read by
                       the daemon, and must be present in the `CredentialSpecs`
@@ -4088,7 +4115,12 @@ definitions:
               type: "object"
               properties:
                 File:
-                  description: "File represents a specific target that is backed by a file."
+                  description: |
+                    File represents a specific target that is backed by a file.
+
+                    <p><br /><p>
+
+                    > **Note**: `Configs.File` and `Configs.Runtime` are mutually exclusive
                   type: "object"
                   properties:
                     Name:
@@ -4679,6 +4711,7 @@ definitions:
         enum:
           - "tcp"
           - "udp"
+          - "sctp"
       TargetPort:
         description: "The port inside the container."
         type: "integer"
@@ -5059,6 +5092,13 @@ definitions:
           Name of the secrets driver used to fetch the secret's value from an
           external secret store.
         $ref: "#/definitions/Driver"
+      Templating:
+        description: |
+          Templating driver, if applicable
+
+          Templating controls whether and how to evaluate the config payload as
+          a template. If no driver is set, no templating is used.
+        $ref: "#/definitions/Driver"
 
   Secret:
     type: "object"
@@ -5095,6 +5135,13 @@ definitions:
           Base64-url-safe-encoded ([RFC 4648](https://tools.ietf.org/html/rfc4648#section-5))
           config data.
         type: "string"
+      Templating:
+        description: |
+          Templating driver, if applicable
+
+          Templating controls whether and how to evaluate the config payload as
+          a template. If no driver is set, no templating is used.
+        $ref: "#/definitions/Driver"
 
   Config:
     type: "object"
@@ -5435,6 +5482,10 @@ definitions:
           See [cpuset(7)](https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt)
         type: "boolean"
         example: true
+      PidsLimit:
+        description: "Indicates if the host kernel has PID limit support enabled."
+        type: "boolean"
+        example: true
       OomKillDisable:
         description: "Indicates if OOM killer disable is supported on the host."
         type: "boolean"
@@ -5572,18 +5623,22 @@ definitions:
         description: |
           HTTP-proxy configured for the daemon. This value is obtained from the
           [`HTTP_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.
+          Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL
+          are masked in the API response.
 
           Containers do not automatically inherit this configuration.
         type: "string"
-        example: "http://user:pass@proxy.corp.example.com:8080"
+        example: "http://xxxxx:xxxxx@proxy.corp.example.com:8080"
       HttpsProxy:
         description: |
           HTTPS-proxy configured for the daemon. This value is obtained from the
           [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.
+          Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL
+          are masked in the API response.
 
           Containers do not automatically inherit this configuration.
         type: "string"
-        example: "https://user:pass@proxy.corp.example.com:4443"
+        example: "https://xxxxx:xxxxx@proxy.corp.example.com:4443"
       NoProxy:
         description: |
           Comma-separated list of domain extensions for which no proxy should be
@@ -5639,10 +5694,10 @@ definitions:
           $ref: "#/definitions/Runtime"
         default:
           runc:
-            path: "docker-runc"
+            path: "runc"
         example:
           runc:
-            path: "docker-runc"
+            path: "runc"
           runc-master:
             path: "/go/bin/runc"
           custom:
@@ -5684,7 +5739,7 @@ definitions:
           - "process"
       InitBinary:
         description: |
-          Name and, optional, path of the the `docker-init` binary.
+          Name and, optional, path of the `docker-init` binary.
 
           If the path is omitted, the daemon searches the host's `$PATH` for the
           binary and uses the first result.
@@ -6014,7 +6069,7 @@ definitions:
           - "https://registry-3.docker.io/"
       Secure:
         description: |
-          Indicates if the the registry is part of the list of insecure
+          Indicates if the registry is part of the list of insecure
           registries.
 
           If `false`, the registry is insecure. Insecure registries accept
@@ -6923,7 +6978,7 @@ paths:
                 OomKillDisable: false
                 OomScoreAdj: 500
                 PidMode: ""
-                PidsLimit: -1
+                PidsLimit: 0
                 PortBindings:
                   22/tcp:
                     - HostPort: "11022"
@@ -7016,6 +7071,7 @@ paths:
           description: "no error"
           schema:
             type: "object"
+            title: "ContainerInspectResponse"
             properties:
               Id:
                 description: "The ID of the container"
@@ -7059,7 +7115,11 @@ paths:
               AppArmorProfile:
                 type: "string"
               ExecIDs:
-                type: "string"
+                description: "IDs of exec instances that are running in the container."
+                type: "array"
+                items:
+                  type: "string"
+                x-nullable: true
               HostConfig:
                 $ref: "#/definitions/HostConfig"
               GraphDriver:
@@ -7277,6 +7337,8 @@ paths:
           description: "no error"
           schema:
             type: "object"
+            title: "ContainerTopResponse"
+            description: "OK response to ContainerTop operation"
             properties:
               Titles:
                 description: "The ps column titles"
@@ -7502,9 +7564,9 @@ paths:
         This endpoint returns a live stream of a container’s resource usage
         statistics.
 
-        The `precpu_stats` is the CPU statistic of last read, which is used
-        for calculating the CPU usage percentage. It is not the same as the
-        `cpu_stats` field.
+        The `precpu_stats` is the CPU statistic of the *previous* read, and is
+        used to calculate the CPU usage percentage. It is not an exact copy
+        of the `cpu_stats` field.
 
         If either `precpu_stats.online_cpus` or `cpu_stats.online_cpus` is
         nil then for compatibility with older daemons the length of the
@@ -7815,6 +7877,13 @@ paths:
           examples:
             application/json:
               message: "No such container: c2ada9df5af8"
+        409:
+          description: "container is not running"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+          examples:
+            application/json:
+              message: "Container d37cde0fe4ad63c3a7252023b2f9800282894247d145cb5933ddf6e52cc03a28 is not running"
         500:
           description: "server error"
           schema:
@@ -7846,6 +7915,8 @@ paths:
           description: "The container has been updated."
           schema:
             type: "object"
+            title: "ContainerUpdateResponse"
+            description: "OK response to ContainerUpdate operation"
             properties:
               Warnings:
                 type: "array"
@@ -8486,6 +8557,7 @@ paths:
           description: "No error"
           schema:
             type: "object"
+            title: "ContainerPruneResponse"
             properties:
               ContainersDeleted:
                 description: "Container IDs that were deleted"
@@ -8781,7 +8853,13 @@ paths:
           description: "No error"
           schema:
             type: "object"
+            title: "BuildPruneResponse"
             properties:
+              CachesDeleted:
+                type: "array"
+                items:
+                  description: "ID of build cache object"
+                  type: "string"
               SpaceReclaimed:
                 description: "Disk space reclaimed in bytes"
                 type: "integer"
@@ -8924,6 +9002,8 @@ paths:
             items:
               type: "object"
               x-go-name: HistoryResponseItem
+              title: "HistoryResponseItem"
+              description: "individual image layer information in response to ImageHistory operation"
               required: [Id, Created, CreatedBy, Tags, Size, Comment]
               properties:
                 Id:
@@ -9141,6 +9221,7 @@ paths:
             type: "array"
             items:
               type: "object"
+              title: "ImageSearchResponseItem"
               properties:
                 description:
                   type: "string"
@@ -9222,6 +9303,7 @@ paths:
           description: "No error"
           schema:
             type: "object"
+            title: "ImagePruneResponse"
             properties:
               ImagesDeleted:
                 description: "Images that were deleted"
@@ -9251,6 +9333,7 @@ paths:
           description: "An identity token was generated successfully."
           schema:
             type: "object"
+            title: "SystemAuthResponse"
             required: [Status]
             properties:
               Status:
@@ -9553,6 +9636,7 @@ paths:
           description: "no error"
           schema:
             type: "object"
+            title: "SystemDataUsageResponse"
             properties:
               LayersSize:
                 type: "integer"
@@ -9569,6 +9653,10 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/definitions/Volume"
+              BuildCache:
+                type: "array"
+                items:
+                  $ref: "#/definitions/BuildCache"
             example:
               LayersSize: 1092588
               Images:
@@ -9991,7 +10079,12 @@ paths:
           description: "No error"
           schema:
             type: "object"
+            title: "ExecInspectResponse"
             properties:
+              CanRemove:
+                type: "boolean"
+              DetachKeys:
+                type: "string"
               ID:
                 type: "string"
               Running:
@@ -10241,6 +10334,7 @@ paths:
           description: "No error"
           schema:
             type: "object"
+            title: "VolumePruneResponse"
             properties:
               VolumesDeleted:
                 description: "Volumes that were deleted"
@@ -10340,6 +10434,10 @@ paths:
 
             Available filters:
 
+            - `dangling=<boolean>` When set to `true` (or `1`), returns all
+               networks that are not in use by a container. When set to `false`
+               (or `0`), only networks that are in use by one or more
+               containers are returned.
             - `driver=<driver-name>` Matches a network's driver.
             - `id=<network-id>` Matches all or part of a network ID.
             - `label=<key>` or `label=<key>=<value>` of a network label.
@@ -10642,6 +10740,7 @@ paths:
           description: "No error"
           schema:
             type: "object"
+            title: "NetworkPruneResponse"
             properties:
               NetworksDeleted:
                 description: "Networks that were deleted"
@@ -11080,6 +11179,7 @@ paths:
             - `label=<engine label>`
             - `membership=`(`accepted`|`pending`)`
             - `name=<node name>`
+            - `node.label=<node label>`
             - `role=`(`manager`|`worker`)`
           type: "string"
       tags: ["Node"]
@@ -11299,6 +11399,9 @@ paths:
             example:
               ListenAddr: "0.0.0.0:2377"
               AdvertiseAddr: "192.168.1.1:2377"
+              DataPathPort: 4789
+              DefaultAddrPool: ["10.10.0.0/8", "20.20.0.0/8"]
+              SubnetSize: 24
               ForceNewCluster: false
               Spec:
                 Orchestration: {}
@@ -11464,6 +11567,7 @@ paths:
           description: "no error"
           schema:
             type: "object"
+            title: "UnlockKeyResponse"
             properties:
               UnlockKey:
                 description: "The swarm's unlock key."
@@ -12172,6 +12276,7 @@ paths:
             Specify as an integer or `all` to output all log lines.
           type: "string"
           default: "all"
+      tags: ["Task"]
   /secrets:
     get:
       summary: "List secrets"
@@ -12244,13 +12349,7 @@ paths:
         201:
           description: "no error"
           schema:
-            type: "object"
-            properties:
-              ID:
-                description: "The ID of the created secret."
-                type: "string"
-            example:
-              ID: "ktnbjxoalbkvbvedmg1urrz8h"
+            $ref: "#/definitions/IdResponse"
         409:
           description: "name conflicts with an existing object"
           schema:
@@ -12457,13 +12556,7 @@ paths:
         201:
           description: "no error"
           schema:
-            type: "object"
-            properties:
-              ID:
-                description: "The ID of the created config."
-                type: "string"
-            example:
-              ID: "ktnbjxoalbkvbvedmg1urrz8h"
+            $ref: "#/definitions/IdResponse"
         409:
           description: "name conflicts with an existing object"
           schema:

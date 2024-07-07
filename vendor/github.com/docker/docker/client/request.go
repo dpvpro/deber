@@ -1,7 +1,8 @@
-package client
+package client // import "github.com/docker/docker/client"
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,8 +17,6 @@ import (
 	"github.com/docker/docker/api/types/versions"
 	"github.com/docker/docker/errdefs"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
-	"golang.org/x/net/context/ctxhttp"
 )
 
 // serverResponse is a wrapper for http API responses.
@@ -233,7 +232,7 @@ func (cli *Client) checkResponseErr(serverResp serverResponse) error {
 	if serverResp.header.Get("Content-Type") == "application/json" && (cli.version == "" || versions.GreaterThan(cli.version, "1.23")) {
 		var errorResponse types.ErrorResponse
 		if err := json.Unmarshal(body, &errorResponse); err != nil {
-			return fmt.Errorf("Error reading JSON: %v", err)
+			return errors.Wrap(err, "Error reading JSON")
 		}
 		daemonErr = errors.New(strings.TrimSpace(errorResponse.Message))
 	} else {

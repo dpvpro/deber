@@ -1,4 +1,4 @@
-package types
+package types // import "github.com/docker/docker/api/types"
 
 import (
 	"time"
@@ -422,6 +422,7 @@ type DiskUsage struct {
 // BuildCachePruneReport contains the response for Engine API:
 // POST "/build/prune"
 type BuildCachePruneReport struct {
+	CachesDeleted  []string
 	SpaceReclaimed uint64
 }
 
