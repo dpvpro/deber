@@ -27,6 +27,7 @@ const (
 var (
 	buildDir     = pflag.StringP("build-dir", "B", "", "where to place build stuff")
 	cacheDir     = pflag.StringP("cache-dir", "C", "", "where to place cached stuff")
+	systemDir    = pflag.StringP("system-dir", "S", "", "system directory for deber")
 	distribution = pflag.StringP("distribution", "d", "", "override target distribution")
 	packages     = pflag.StringArrayP("package", "p", nil, "additional packages to be installed in container (either single .deb or a directory)")
 	age          = pflag.DurationP("age", "a", time.Hour*24*14, "time after which image will be refreshed")
@@ -37,6 +38,8 @@ var (
 	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
 	noLogColor   = pflag.BoolP("no-log-color", "", false, "do not colorize log output")
 	noRemove     = pflag.BoolP("no-remove", "", false, "do not remove container at the end of the process")
+	
+	packagesDir  string
 )
 
 func main() {
@@ -72,38 +75,42 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	// home, err := os.UserHomeDir()
-	// if err != nil {
-	// 	return err
-	// }
-
-	home := filepath.Join(os.TempDir(), Program)
-	err = os.MkdirAll(home, os.ModePerm)
-	if err != nil {
-		return err
+	if *systemDir == "" {
+		*systemDir = filepath.Join(os.TempDir(), Program)
+		packagesDir = filepath.Join(*systemDir, "packages")
+	} else {
+		packagesDir = *systemDir
 	}
-
-	source := filepath.Join(home, "sources")
-	err = os.MkdirAll(source, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
+	
+	sources := filepath.Join(*systemDir, "sources")
 
 	if *buildDir == "" {
-		*buildDir = filepath.Join(home, "builddir")
-		err = os.MkdirAll(*buildDir, os.ModePerm)
-		if err != nil {
-			return err
-		}
+		*buildDir = filepath.Join(*systemDir, "builddir")
 	}
 
 	if *cacheDir == "" {
-  	*cacheDir = filepath.Join(home, "cachedir")
-  	err = os.MkdirAll(*cacheDir, os.ModePerm)
-  	if err != nil {
-  		return err
-  	}
+		*cacheDir = filepath.Join(*systemDir, "cachedir")
+	}
+
+	err = os.MkdirAll(*systemDir, os.ModePerm)
+	if err != nil {
+		return err
+	}	
+	err = os.MkdirAll(packagesDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(sources, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(*buildDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(*cacheDir, os.ModePerm)
+	if err != nil {
+		return err
 	}
 
 	path := filepath.Join(cwd, "debian/changelog")
@@ -117,15 +124,15 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	namingArgs := naming.Args{
-		Prefix:         Program,
-		Source:         ch.Source,
-		Version:        ch.Version.String(),
-		Upstream:       ch.Version.Version,
-		Target:         *distribution,
-		SourceBaseDir:  cwd,
-		BuildBaseDir:   *buildDir,
-		CacheBaseDir:   *cacheDir,
-		PackagesBaseDir: filepath.Join(home, "packages"),
+		Prefix:          Program,
+		Source:          ch.Source,
+		Version:         ch.Version.String(),
+		Upstream:        ch.Version.Version,
+		Target:          *distribution,
+		SourceBaseDir:   cwd,
+		BuildBaseDir:    *buildDir,
+		CacheBaseDir:    *cacheDir,
+		PackagesBaseDir: packagesDir,
 	}
 	n := naming.New(namingArgs)
 
