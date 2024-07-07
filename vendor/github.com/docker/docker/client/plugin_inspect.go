@@ -3,7 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 
 	"github.com/docker/docker/api/types"
 	"golang.org/x/net/context"
@@ -12,12 +12,12 @@ import (
 // PluginInspectWithRaw inspects an existing plugin
 func (cli *Client) PluginInspectWithRaw(ctx context.Context, name string) (*types.Plugin, []byte, error) {
 	resp, err := cli.get(ctx, "/plugins/"+name+"/json", nil, nil)
+	defer ensureReaderClosed(resp)
 	if err != nil {
-		return nil, nil, wrapResponseError(err, resp, "plugin", name)
+		return nil, nil, err
 	}
 
-	defer ensureReaderClosed(resp)
-	body, err := ioutil.ReadAll(resp.body)
+	body, err := io.ReadAll(resp.body)
 	if err != nil {
 		return nil, nil, err
 	}

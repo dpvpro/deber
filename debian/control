@@ -1,15 +1,15 @@
 Source: deber
 Section: utils
 Priority: optional
-Maintainer: Dawid Dziurla <dawidd0811@gmail.com>
+Maintainer: Denis Proskurin <dpvpro@gmail.com>
 Rules-Requires-Root: no
 Build-Depends:
  debhelper-compat (= 12),
  dh-golang,
  golang-any,
-Standards-Version: 4.4.0
-Homepage: https://github.com/dawidd6/deber
-XS-Go-Import-Path: github.com/dawidd6/deber
+Standards-Version: 4.6.2
+Homepage: https://github.com/dpvpro/deber
+XS-Go-Import-Path: github.com/dpvpro/deber
 Testsuite: autopkgtest-pkg-go
 
 Package: deber

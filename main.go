@@ -2,30 +2,31 @@ package main
 
 import (
 	"fmt"
-	"github.com/dawidd6/deber/pkg/docker"
-	"github.com/dawidd6/deber/pkg/log"
-	"github.com/dawidd6/deber/pkg/naming"
-	"github.com/dawidd6/deber/pkg/steps"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"os"
 	"path/filepath"
-	"pault.ag/go/debian/changelog"
 	"time"
+
+	"github.com/dpvpro/deber/pkg/docker"
+	"github.com/dpvpro/deber/pkg/log"
+	"github.com/dpvpro/deber/pkg/naming"
+	"github.com/dpvpro/deber/pkg/steps"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"pault.ag/go/debian/changelog"
 )
 
 const (
 	// Program is the name of program
 	Program = "deber"
 	// Version of program
-	Version = "1.2.0"
+	Version = "1.3.0"
 	// Description of program
 	Description = "Debian packaging with Docker."
 )
 
 var (
-	buildDir     = pflag.StringP("build-dir", "B", "/tmp", "where to place build stuff")
-	cacheDir     = pflag.StringP("cache-dir", "C", "/tmp", "where to place cached stuff")
+	buildDir     = pflag.StringP("build-dir", "B", "", "where to place build stuff")
+	cacheDir     = pflag.StringP("cache-dir", "C", "", "where to place cached stuff")
 	distribution = pflag.StringP("distribution", "d", "", "override target distribution")
 	packages     = pflag.StringArrayP("package", "p", nil, "additional packages to be installed in container (either single .deb or a directory)")
 	age          = pflag.DurationP("age", "a", time.Hour*24*14, "time after which image will be refreshed")
@@ -33,9 +34,9 @@ var (
 	shell        = pflag.BoolP("shell", "s", false, "launch interactive shell in container")
 	dpkgFlags    = pflag.StringP("dpkg-flags", "D", "-tc", "additional flags to be passed to dpkg-buildpackage in container")
 	lintianFlags = pflag.StringP("lintian-flags", "L", "-i -I", "additional flags to be passed to lintian in container")
-	noLintian    = pflag.BoolP("no-lintian", "l", false, "don't run lintian in container")
-	noLogColor   = pflag.BoolP("no-log-color", "c", false, "do not colorize log output")
-	noRemove     = pflag.BoolP("no-remove", "r", false, "do not remove container at the end of the process")
+	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
+	noLogColor   = pflag.BoolP("no-log-color", "", false, "do not colorize log output")
+	noRemove     = pflag.BoolP("no-remove", "", false, "do not remove container at the end of the process")
 )
 
 func main() {
@@ -71,9 +72,38 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	home, err := os.UserHomeDir()
+	// home, err := os.UserHomeDir()
+	// if err != nil {
+	// 	return err
+	// }
+
+	home := filepath.Join(os.TempDir(), Program)
+	err = os.MkdirAll(home, os.ModePerm)
 	if err != nil {
 		return err
+	}
+
+	source := filepath.Join(home, "sources")
+	err = os.MkdirAll(source, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+
+	if *buildDir == "" {
+		*buildDir = filepath.Join(home, "builddir")
+		err = os.MkdirAll(*buildDir, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
+	if *cacheDir == "" {
+  	*cacheDir = filepath.Join(home, "cachedir")
+  	err = os.MkdirAll(*cacheDir, os.ModePerm)
+  	if err != nil {
+  		return err
+  	}
 	}
 
 	path := filepath.Join(cwd, "debian/changelog")
@@ -95,7 +125,7 @@ func run(cmd *cobra.Command, args []string) error {
 		SourceBaseDir:  cwd,
 		BuildBaseDir:   *buildDir,
 		CacheBaseDir:   *cacheDir,
-		ArchiveBaseDir: filepath.Join(home, Program),
+		PackagesBaseDir: filepath.Join(home, "packages"),
 	}
 	n := naming.New(namingArgs)
 
@@ -133,7 +163,7 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = steps.Test(dock, n, *lintianFlags, *noLintian)
+	err = steps.Test(dock, n, *lintianFlags, *lintian)
 	if err != nil {
 		return err
 	}
@@ -151,6 +181,5 @@ func run(cmd *cobra.Command, args []string) error {
 	if *noRemove {
 		return nil
 	}
-
 	return steps.Remove(dock, n)
 }

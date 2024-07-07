@@ -3,7 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 
 	"github.com/docker/docker/api/types/swarm"
 	"golang.org/x/net/context"
@@ -11,16 +11,16 @@ import (
 
 // SecretInspectWithRaw returns the secret information with raw data
 func (cli *Client) SecretInspectWithRaw(ctx context.Context, id string) (swarm.Secret, []byte, error) {
-	if err := cli.NewVersionError("1.25", "secret inspect"); err != nil {
+	if err := cli.NewVersionError(ctx, "1.25", "secret inspect"); err != nil {
 		return swarm.Secret{}, nil, err
 	}
 	resp, err := cli.get(ctx, "/secrets/"+id, nil, nil)
-	if err != nil {
-		return swarm.Secret{}, nil, wrapResponseError(err, resp, "secret", id)
-	}
 	defer ensureReaderClosed(resp)
+	if err != nil {
+		return swarm.Secret{}, nil, err
+	}
 
-	body, err := ioutil.ReadAll(resp.body)
+	body, err := io.ReadAll(resp.body)
 	if err != nil {
 		return swarm.Secret{}, nil, err
 	}

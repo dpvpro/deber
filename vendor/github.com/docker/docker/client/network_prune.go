@@ -4,16 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
-	"golang.org/x/net/context"
+	"github.com/docker/docker/api/types/network"
 )
 
 // NetworksPrune requests the daemon to delete unused networks
-func (cli *Client) NetworksPrune(ctx context.Context, pruneFilters filters.Args) (types.NetworksPruneReport, error) {
-	var report types.NetworksPruneReport
+func (cli *Client) NetworksPrune(ctx context.Context, pruneFilters filters.Args) (network.PruneReport, error) {
+	var report network.PruneReport
 
-	if err := cli.NewVersionError("1.25", "network prune"); err != nil {
+	if err := cli.NewVersionError(ctx, "1.25", "network prune"); err != nil {
 		return report, err
 	}
 
@@ -23,10 +22,10 @@ func (cli *Client) NetworksPrune(ctx context.Context, pruneFilters filters.Args)
 	}
 
 	serverResp, err := cli.post(ctx, "/networks/prune", query, nil, nil)
+	defer ensureReaderClosed(serverResp)
 	if err != nil {
 		return report, err
 	}
-	defer ensureReaderClosed(serverResp)
 
 	if err := json.NewDecoder(serverResp.body).Decode(&report); err != nil {
 		return report, fmt.Errorf("Error retrieving network prune report: %v", err)

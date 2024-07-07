@@ -1,14 +1,15 @@
 package client
 
 import (
-	"github.com/docker/docker/api/types"
+	"context"
+
 	"github.com/docker/docker/api/types/network"
 	"golang.org/x/net/context"
 )
 
 // NetworkConnect connects a container to an existent network in the docker host.
 func (cli *Client) NetworkConnect(ctx context.Context, networkID, containerID string, config *network.EndpointSettings) error {
-	nc := types.NetworkConnect{
+	nc := network.ConnectOptions{
 		Container:      containerID,
 		EndpointConfig: config,
 	}

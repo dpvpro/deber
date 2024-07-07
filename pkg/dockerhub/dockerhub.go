@@ -2,32 +2,31 @@
 package dockerhub
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"github.com/thedevsaddam/gojsonq"
 )
-
-// Tag struct represents single JSON object received from
-// DockerHub API after querying it for list of tags for particular repository.
-type Tag struct {
-	Layer string
-	Name  string
-}
 
 // GetTags function queries DockerHub API for a list of all
 // available tags of a given repository.
-func GetTags(repo string) ([]Tag, error) {
-	tags := &[]Tag{}
-	url := fmt.Sprintf("https://registry.hub.docker.com/v1/repositories/%s/tags", repo)
+//
+// https://stackoverflow.com/questions/48856693/dockerhub-api-listing-tags
+// curl -s GET 'https://hub.docker.com/v2/repositories/library/debian/tags?page_size=1000' | jq -r '.results|.[]|.name
+//
+func GetTags(repo string) ([]string, error) {
+	tags := []string{}
+
+	url := fmt.Sprintf("https://hub.docker.com/v2/repositories/library/%s/tags?page_size=1000", repo)
 
 	response, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
 
-	bytes, err := ioutil.ReadAll(response.Body)
+	bytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -37,12 +36,25 @@ func GetTags(repo string) ([]Tag, error) {
 		return nil, err
 	}
 
-	err = json.Unmarshal(bytes, tags)
+ 	jsonRaw := string(bytes)
+
+ 	jq := gojsonq.New().FromString(jsonRaw)
+	if jq.Error() != nil {
+		return nil, err
+	}
+
+	res, err := jq.From("results").PluckR("name")
 	if err != nil {
 		return nil, err
 	}
 
-	return *tags, nil
+	// fmt.Println(res)
+	// fmt.Printf("%#v\n", res)
+
+	tags, _ = res.StringSlice()
+	// fmt.Printf("%#v\n", tags)
+
+	return tags, nil
 }
 
 // MatchRepo returns repo which has the given tag
@@ -54,7 +66,7 @@ func MatchRepo(repos []string, tag string) (string, error) {
 		}
 
 		for _, t := range tags {
-			if t.Name == tag {
+			if t == tag {
 				return repo, nil
 			}
 		}

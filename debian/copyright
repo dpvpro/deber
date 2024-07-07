@@ -1,11 +1,12 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Source: https://github.com/dawidd6/deber
+Source: https://github.com/dpvpro/deber
 Upstream-Name: deber
 
 Files:
  *
 Copyright:
  2019 Dawid Dziurla <dawidd0811@gmail.com>
+ 2024 Denis Proskurin <dpvpro@gmail.com>
 License: Expat
 
 License: Expat

@@ -3,7 +3,7 @@ package client
 import (
 	"net/url"
 
-	"github.com/docker/distribution/reference"
+	"github.com/distribution/reference"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )

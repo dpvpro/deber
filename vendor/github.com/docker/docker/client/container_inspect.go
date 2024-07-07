@@ -3,7 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/url"
 
 	"github.com/docker/docker/api/types"
@@ -13,8 +13,9 @@ import (
 // ContainerInspect returns the container information.
 func (cli *Client) ContainerInspect(ctx context.Context, containerID string) (types.ContainerJSON, error) {
 	serverResp, err := cli.get(ctx, "/containers/"+containerID+"/json", nil, nil)
+	defer ensureReaderClosed(serverResp)
 	if err != nil {
-		return types.ContainerJSON{}, wrapResponseError(err, serverResp, "container", containerID)
+		return types.ContainerJSON{}, err
 	}
 
 	var response types.ContainerJSON
@@ -30,12 +31,12 @@ func (cli *Client) ContainerInspectWithRaw(ctx context.Context, containerID stri
 		query.Set("size", "1")
 	}
 	serverResp, err := cli.get(ctx, "/containers/"+containerID+"/json", query, nil)
-	if err != nil {
-		return types.ContainerJSON{}, nil, wrapResponseError(err, serverResp, "container", containerID)
-	}
 	defer ensureReaderClosed(serverResp)
+	if err != nil {
+		return types.ContainerJSON{}, nil, err
+	}
 
-	body, err := ioutil.ReadAll(serverResp.body)
+	body, err := io.ReadAll(serverResp.body)
 	if err != nil {
 		return types.ContainerJSON{}, nil, err
 	}

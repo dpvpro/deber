@@ -1,9 +1,8 @@
 # deber
 
-![](https://github.com/dawidd6/deber/workflows/Tests/badge.svg)
-[![GoDoc](https://godoc.org/github.com/dawidd6/deber?status.svg)](https://godoc.org/github.com/dawidd6/deber)
-[![go report card](https://goreportcard.com/badge/github.com/dawidd6/deber)](https://goreportcard.com/report/github.com/dawidd6/deber)
-[![latest tag](https://img.shields.io/github/tag-date/dawidd6/deber.svg)](https://github.com/dawidd6/deber/releases/latest)
+![](https://github.com/dpvpro/deber/workflows/Tests/badge.svg)
+[![GoDoc](https://godoc.org/github.com/dpvpro/deber?status.svg)](https://godoc.org/github.com/dpvpro/deber)
+[![go report card](https://goreportcard.com/badge/github.com/dpvpro/deber)](https://goreportcard.com/report/github.com/dpvpro/deber)
 
 ### `Debian` **+** `Docker` **=** `deber`
 
@@ -38,16 +37,10 @@ Docker containers.
 
 ## Installation
 
-**Homebrew**
+**Source (latest master)**
 
 ```bash
-brew install dawidd6/tap/deber
-```
-
-**Source**
-
-```bash
-go install github.com/dawidd6/deber@latest
+go install github.com/dpvpro/deber@latest
 ```
 
 ## Usage
@@ -80,19 +73,17 @@ deber -p ~/deber/unstable/pkg1/1.0.0-1 -p ~/deber/unstable/pkg2/2.0.0-2
 
 ## FAQ
 
-**Okay everything went well, but... where the hell is my `.deb`?!**
+**Ok, everything went well, but... where is my `.deb`?!**
 
-The location for all build outputs defaults to `$HOME/deber`.
-I made it this way, because it was just hard to look at my parent directory,
-cluttered with `.orig.tar.gz`, `.deb`, `.changes` and God knows what else.
+The location for all build outputs defaults to `$TMP/deber/packages`.
 
 **Where is build directory located?**
 
-`/tmp/$CONTAINER`
+`$TMP/deber/builddir/$CONTAINER`
 
 **Where is apt's cache directory located?**
 
-`/tmp/$IMAGE`
+`$TMP/deber/cachedir/$IMAGE`
 
 **How images built by deber are named?**
 
@@ -109,10 +100,6 @@ Make a new entry with desired target distribution in `debian/changelog`
 and run `deber`.
 
 Or specify the desired distribution with `--distribution` option.
-
-**How to cross-build package for different architecture?**
-
-This is not implemented yet. But I'm planning to make use of `qemu` or something else.
 
 ## CONTRIBUTING
 

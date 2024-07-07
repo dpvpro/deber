@@ -3,12 +3,13 @@ package docker
 
 import (
 	"context"
+
 	"github.com/docker/docker/client"
 )
 
 const (
 	// APIVersion constant is the minimum supported version of Docker Engine API
-	APIVersion = "1.30"
+	APIVersion = "1.45"
 )
 
 // Docker struct represents Docker client.
