@@ -9,9 +9,9 @@ package volume
 
 import "github.com/docker/docker/api/types"
 
-// VolumeListOKBody Volume list response
-// swagger:model VolumeListOKBody
-type VolumeListOKBody struct {
+// VolumesListOKBody volumes list o k body
+// swagger:model VolumesListOKBody
+type VolumesListOKBody struct {
 
 	// List of volumes
 	// Required: true

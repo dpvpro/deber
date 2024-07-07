@@ -1,18 +1,16 @@
-package client // import "github.com/docker/docker/client"
+package client
 
 import (
-	"context"
 	"encoding/json"
 	"net/url"
 	"strconv"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/swarm"
+	"golang.org/x/net/context"
 )
 
-// ServiceUpdate updates a Service. The version number is required to avoid conflicting writes.
-// It should be the value as set *before* the update. You can find this value in the Meta field
-// of swarm.Service, which can be found using ServiceInspectWithRaw.
+// ServiceUpdate updates a Service.
 func (cli *Client) ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (types.ServiceUpdateResponse, error) {
 	var (
 		query   = url.Values{}
