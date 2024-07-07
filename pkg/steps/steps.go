@@ -364,8 +364,11 @@ func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwor
 			Cmd:     "COLUMNS=80 svace init --bare " + filepath.Join(naming.ContainerSvaceDir, n.Source + "_" + n.Version),
 			Network: withNetwork,
 		}, {
-			Name:	 n.Container,
-			Cmd:     "COLUMNS=80 DEB_BUILD_OPTIONS='nocheck' svace build --svace-dir " + filepath.Join(naming.ContainerSvaceDir, n.Source + "_" + n.Version) + " dpkg-buildpackage " + dpkgFlags + "; if [[ $? -eq 0 || $? -eq 255 ]]; then true; else false; fi",
+			Name:	n.Container,
+			Cmd:	"COLUMNS=80 DEB_BUILD_OPTIONS='nocheck' svace build --svace-dir " +
+		 			filepath.Join(naming.ContainerSvaceDir, n.Source + "_" + n.Version) +
+					" dpkg-buildpackage " + dpkgFlags +
+					" ; if [[ $? -eq 0 || $? -eq 255 ]]; then true; else false; fi",
 			Network: withNetwork,
 		},
 	}

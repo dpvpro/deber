@@ -99,7 +99,6 @@ func run(cmd *cobra.Command, args []string) error {
 		CacheBaseDir:   *cacheDir,
 		ArchiveBaseDir: filepath.Join(home, Program),
 		SvaceBaseDir:   *svaceDir,
-
 	}
 	n := naming.New(namingArgs)
 
