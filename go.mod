@@ -1,5 +1,11 @@
 module github.com/dpvpro/deber
 
+retract (
+	v1.3.1 // experiment
+	v1.3.0 // experiment
+	v1.2.5 // experiment
+)
+
 require (
 	github.com/docker/docker v27.0.1+incompatible
 	github.com/moby/term v0.5.0
