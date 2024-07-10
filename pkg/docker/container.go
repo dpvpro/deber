@@ -158,7 +158,6 @@ func (docker *Docker) ContainerStop(name string) error {
 
 // ContainerRemove function removes container, just that.
 func (docker *Docker) ContainerRemove(name string) error {
-	// options := types.ContainerRemoveOptions{}
 	options := container.RemoveOptions{}
 	return docker.cli.ContainerRemove(docker.ctx, name, options)
 }

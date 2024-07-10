@@ -48,11 +48,7 @@ func GetTags(repo string) ([]string, error) {
 		return nil, err
 	}
 
-	// fmt.Println(res)
-	// fmt.Printf("%#v\n", res)
-
 	tags, _ = res.StringSlice()
-	// fmt.Printf("%#v\n", tags)
 
 	return tags, nil
 }
