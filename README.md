@@ -4,7 +4,7 @@
 [![GoDoc](https://godoc.org/github.com/dpvpro/deber?status.svg)](https://godoc.org/github.com/dpvpro/deber)
 [![go report card](https://goreportcard.com/badge/github.com/dpvpro/deber)](https://goreportcard.com/report/github.com/dpvpro/deber)
 
-### `Debian` **+** `Docker` **=** `deber`
+### `Debian` **+** `Docker` **=** `Deber`
 
 Utility made with simplicity in mind to provide
 an easy way for building Debian packages in
