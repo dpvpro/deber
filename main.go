@@ -38,8 +38,8 @@ var (
 	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
 	noLogColor   = pflag.BoolP("no-log-color", "", false, "do not colorize log output")
 	noRemove     = pflag.BoolP("no-remove", "", false, "do not remove container at the end of the process")
-	
-	packagesDir  string
+
+	packagesDir string
 )
 
 func main() {
@@ -81,7 +81,7 @@ func run(cmd *cobra.Command, args []string) error {
 	} else {
 		packagesDir = *systemDir
 	}
-	
+
 	sources := filepath.Join(*systemDir, "sources")
 
 	if *buildDir == "" {
@@ -95,7 +95,7 @@ func run(cmd *cobra.Command, args []string) error {
 	err = os.MkdirAll(*systemDir, os.ModePerm)
 	if err != nil {
 		return err
-	}	
+	}
 	err = os.MkdirAll(packagesDir, os.ModePerm)
 	if err != nil {
 		return err

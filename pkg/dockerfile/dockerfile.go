@@ -54,13 +54,13 @@ func Parse(repo, tag string) ([]byte, error) {
 		SourceDir: naming.ContainerSourceDir,
 	}
 
-	temp, err := template.New("dockerfile").Parse(dockerfileTemplate)
+	templ, err := template.New("dockerfile").Parse(dockerfileTemplate)
 	if err != nil {
 		return nil, err
 	}
 
 	buffer := new(bytes.Buffer)
-	err = temp.Execute(buffer, t)
+	err = templ.Execute(buffer, t)
 	if err != nil {
 		return nil, err
 	}

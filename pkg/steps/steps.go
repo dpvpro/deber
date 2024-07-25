@@ -49,12 +49,12 @@ func Build(dock *docker.Docker, n *naming.Naming, maxAge time.Duration) error {
 	repos := []string{"debian", "ubuntu"}
 	repo, err := dockerhub.MatchRepo(repos, n.Target)
 	if err != nil {
-    return log.Failed(err)
+		return log.Failed(err)
 	}
 
 	dockerFile, err := dockerfile.Parse(repo, n.Target)
 	if err != nil {
-     return log.Failed(err)
+		return log.Failed(err)
 	}
 
 	log.Drop()
@@ -243,7 +243,7 @@ func Tarball(n *naming.Naming) error {
 	if len(buildTarballs) > 1 {
 		return log.Failed(errors.New("multiple tarballs found in build directory"))
 	}
-	
+
 	// fmt.Println(sourceTarballs)
 	if len(sourceTarballs) > 1 {
 		return log.Failed(errors.New("multiple tarballs found in parent source directory"))
@@ -329,7 +329,7 @@ func Depends(dock *docker.Docker, n *naming.Naming, extraPackages []string) erro
 }
 
 // Package function executes "dpkg-buildpackage" in container.
-// enables network back.
+// Enables network back.
 func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwork bool) error {
 	log.Info("Packaging software")
 	log.Drop()
@@ -350,15 +350,15 @@ func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwor
 // Test function executes "debi", "debc" and "lintian" in container.
 func Test(dock *docker.Docker, n *naming.Naming, lintianFlags string, lintian bool) error {
 
-  log.Info("Testing package")
-
-  // skip tests
+	log.Info("Testing package")
+	
+	// skip tests
 	if !lintian {
 		return log.Skipped()
 	}
-  
+
   log.Drop()
-	
+
 	args := []docker.ContainerExecArgs{
 		{
 			Name:    n.Container,
@@ -371,7 +371,6 @@ func Test(dock *docker.Docker, n *naming.Naming, lintianFlags string, lintian bo
 		}, {
 			Name: n.Container,
 			Cmd:  "lintian" + " " + lintianFlags,
-			Skip: !lintian,
 		},
 	}
 
