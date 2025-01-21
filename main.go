@@ -21,7 +21,7 @@ const (
 	// Version of program
 	Version = "1.4.1"
 	// Description of program
-	Description = "Debian packaging with Docker."
+	Description = "Debian packaging with Docker"
 )
 
 var (
@@ -48,12 +48,14 @@ func main() {
 		Short:   Description,
 		Version: Version,
 		RunE:    run,
+		SilenceUsage: true,
+		SilenceErrors: true,
+		Hidden: true,
+		DisableFlagsInUseLine: true,
 	}
-
-	cmd.SetHelpCommand(&cobra.Command{Hidden: true})
-	cmd.DisableFlagsInUseLine = true
-	cmd.SilenceUsage = true
-	cmd.SilenceErrors = true
+	
+	// cmd.SetHelpCommand(&cobra.Command{Hidden: true})
+	// cmd.DisableFlagsInUseLine = true
 
 	err := cmd.Execute()
 	if err != nil {

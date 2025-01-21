@@ -357,7 +357,7 @@ func Test(dock *docker.Docker, n *naming.Naming, lintianFlags string, lintian bo
 		return log.Skipped()
 	}
 
-  log.Drop()
+	log.Drop()
 
 	args := []docker.ContainerExecArgs{
 		{
