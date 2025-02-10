@@ -9,7 +9,7 @@ import (
 
 const (
 	// APIVersion constant is the minimum supported version of Docker Engine API
-	APIVersion = "1.42"
+	APIVersion = "1.46"
 )
 
 // Docker struct represents Docker client.
