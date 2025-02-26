@@ -272,7 +272,7 @@ func (docker *Docker) ContainerExec(args ContainerExecArgs) error {
 }
 
 func (docker *Docker) resizeIfChanged(execID string, fd uintptr) {
-	channel := make(chan os.Signal)
+	channel := make(chan os.Signal, 1)
 	signal.Notify(channel, syscall.SIGWINCH)
 
 	for {
