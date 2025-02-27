@@ -312,7 +312,7 @@ func Depends(dock *docker.Docker, n *naming.Naming, extraPackages []string) erro
 			Network: true,
 		}, {
 			Name:    n.Container,
-			Cmd:     "apt-get build-dep ./ -t " + n.Target,
+			Cmd:     "apt-get build-dep ./",
 			Network: true,
 			AsRoot:  true,
 		},
