@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"slices"
 	"strings"
 	"syscall"
 
@@ -68,10 +69,8 @@ func (docker *Docker) IsContainerCreated(name string) (bool, error) {
 	}
 
 	for i := range list {
-		for j := range list[i].Names {
-			if list[i].Names[j] == "/"+name {
-				return true, nil
-			}
+		if slices.Contains(list[i].Names, "/"+name) {
+			return true, nil
 		}
 	}
 

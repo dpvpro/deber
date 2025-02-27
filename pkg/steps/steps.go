@@ -290,12 +290,12 @@ func Depends(dock *docker.Docker, n *naming.Naming, extraPackages []string) erro
 	args := []docker.ContainerExecArgs{
 		{
 			Name:    n.Container,
-			Cmd:     "rm -f a.list",
+			Cmd:     "rm -f a.sources",
 			AsRoot:  true,
 			WorkDir: "/etc/apt/sources.list.d",
 		}, {
 			Name:    n.Container,
-			Cmd:     "echo deb [trusted=yes] file://" + naming.ContainerArchiveDir + " ./ > a.list",
+			Cmd:     "echo URIs: file://" + naming.ContainerArchiveDir + " ./ > a.sources",
 			AsRoot:  true,
 			WorkDir: "/etc/apt/sources.list.d",
 			Skip:    extraPackages == nil,
