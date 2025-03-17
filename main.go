@@ -19,7 +19,7 @@ const (
 	// Program is the name of program
 	Program = "deber"
 	// Version of program
-	Version = "1.4.3"
+	Version = "1.4.4"
 	// Description of program
 	Description = "Debian packaging with Docker"
 )
@@ -44,16 +44,16 @@ var (
 
 func main() {
 	cmd := &cobra.Command{
-		Use:     fmt.Sprintf("%s [FLAGS ...]", Program),
-		Short:   Description,
-		Version: Version,
-		RunE:    run,
-		SilenceUsage: true,
-		SilenceErrors: true,
-		Hidden: true,
+		Use:                   fmt.Sprintf("%s [FLAGS ...]", Program),
+		Short:                 Description,
+		Version:               Version,
+		RunE:                  run,
+		SilenceUsage:          true,
+		SilenceErrors:         true,
+		Hidden:                true,
 		DisableFlagsInUseLine: true,
 	}
-	
+
 	// cmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	// cmd.DisableFlagsInUseLine = true
 
