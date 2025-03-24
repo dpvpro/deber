@@ -19,7 +19,7 @@ const (
 	// Program is the name of program
 	Program = "deber"
 	// Version of program
-	Version = "1.4.4"
+	Version = "1.4.5"
 	// Description of program
 	Description = "Debian packaging with Docker"
 )
@@ -28,13 +28,13 @@ var (
 	buildDir     = pflag.StringP("build-dir", "B", "", "where to place build stuff")
 	cacheDir     = pflag.StringP("cache-dir", "C", "", "where to place cached stuff")
 	systemDir    = pflag.StringP("system-dir", "S", "", "system directory for deber")
-	distribution = pflag.StringP("distribution", "d", "", "override target distribution")
-	packages     = pflag.StringArrayP("package", "p", nil, "additional packages to be installed in container (either single .deb or a directory)")
+	distribution = pflag.StringP("distribution", "T", "", "override target distribution")
+	dpkgFlags    = pflag.StringP("dpkg-flags", "D", "-tc", "additional flags to be passed to dpkg-buildpackage in container")
+	lintianFlags = pflag.StringP("lintian-flags", "L", "-i -I", "additional flags to be passed to lintian in container")
+	packages     = pflag.StringArrayP("package", "P", nil, "additional packages to be installed in container (either single .deb or a directory)")
 	age          = pflag.DurationP("age", "a", time.Hour*24*14, "time after which image will be refreshed")
 	network      = pflag.BoolP("network", "n", false, "allow network access during package build")
 	shell        = pflag.BoolP("shell", "s", false, "launch interactive shell in container")
-	dpkgFlags    = pflag.StringP("dpkg-flags", "D", "-tc", "additional flags to be passed to dpkg-buildpackage in container")
-	lintianFlags = pflag.StringP("lintian-flags", "L", "-i -I", "additional flags to be passed to lintian in container")
 	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
 	noLogColor   = pflag.BoolP("no-log-color", "", false, "do not colorize log output")
 	noRemove     = pflag.BoolP("no-remove", "", false, "do not remove container at the end of the process")
