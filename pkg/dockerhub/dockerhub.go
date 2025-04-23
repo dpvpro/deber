@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
+
 	"github.com/thedevsaddam/gojsonq"
 )
 
@@ -17,8 +19,9 @@ import (
 // curl -s GET 'https://hub.docker.com/v2/repositories/library/debian/tags?page_size=1000' | jq -r '.results|.[]|.name
 //
 func GetTags(repo string) ([]string, error) {
-	tags := []string{}
-
+	
+	var tags []string
+	
 	url := fmt.Sprintf("https://hub.docker.com/v2/repositories/library/%s/tags?page_size=1000", repo)
 
 	response, err := http.Get(url)
@@ -61,10 +64,8 @@ func MatchRepo(repos []string, tag string) (string, error) {
 			return "", err
 		}
 
-		for _, t := range tags {
-			if t == tag {
-				return repo, nil
-			}
+		if slices.Contains(tags, tag) {
+			return repo, nil
 		}
 	}
 

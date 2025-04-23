@@ -107,16 +107,16 @@ func New(args Args) *Naming {
 func standardizeVersion(version string) string {
 	// Docker allows only [a-zA-Z0-9][a-zA-Z0-9_.-]
 	// and Debian package versioning allows these characters
-	version = strings.Replace(version, "~", "-", -1)
-	version = strings.Replace(version, ":", "-", -1)
-	version = strings.Replace(version, "+", "-", -1)
+	version = strings.ReplaceAll(version, "~", "-")
+	version = strings.ReplaceAll(version, ":", "-")
+	version = strings.ReplaceAll(version, "+", "-")
 
 	return version
 }
 
 func standardizeTarget(version, target string) string {
 	// UNRELEASED == unstable
-	target = strings.Replace(target, "UNRELEASED", "unstable", -1)
+	target = strings.ReplaceAll(target, "UNRELEASED", "unstable")
 	target = strings.Split(target, "-")[0]
 
 	// Debian backport
