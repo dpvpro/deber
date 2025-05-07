@@ -336,7 +336,7 @@ func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwor
 
 	args := docker.ContainerExecArgs{
 		Name:    n.Container,
-		Cmd:     "dpkg-buildpackage" + " " + dpkgFlags,
+		Cmd:     "dpkg-buildpackage " + dpkgFlags,
 		Network: withNetwork,
 	}
 	err := dock.ContainerExec(args)

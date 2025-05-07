@@ -37,7 +37,8 @@ RUN printf "Package: *\nPin: origin \"\"\nPin-Priority: 990\n" > /etc/apt/prefer
 # Install required packages.
 RUN apt-get update && \
 	apt-get install --no-install-recommends -y \
-	build-essential devscripts debhelper lintian fakeroot dpkg-dev ranger
+	build-essential devscripts debhelper lintian fakeroot dpkg-dev \
+	ranger neovim 
 
 # Set working directory.
 WORKDIR {{ .SourceDir }}
