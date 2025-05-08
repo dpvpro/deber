@@ -19,7 +19,7 @@ const (
 	// Program is the name of program
 	Program = "deber"
 	// Version of program
-	Version = "1.4.6"
+	Version = "1.4.7"
 	// Description of program
 	Description = "Debian packaging with Docker"
 )
@@ -170,6 +170,10 @@ func run(cmd *cobra.Command, args []string) error {
 
 	err = steps.Package(dock, n, *dpkgFlags, *network, *noTest)
 	if err != nil {
+		errRemove := steps.Remove(dock, n)
+		if errRemove != nil {
+			 fmt.Printf("%s", errRemove)
+		}
 		return err
 	}
 
