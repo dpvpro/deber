@@ -19,7 +19,7 @@ const (
 	// Program is the name of program
 	Program = "deber"
 	// Version of program
-	Version = "1.4.5"
+	Version = "1.4.6"
 	// Description of program
 	Description = "Debian packaging with Docker"
 )
@@ -36,6 +36,7 @@ var (
 	network      = pflag.BoolP("network", "n", false, "allow network access during package build")
 	shell        = pflag.BoolP("shell", "s", false, "launch interactive shell in container")
 	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
+	noTest       = pflag.BoolP("no-test", "t", true, "do not test when building package")
 	noLogColor   = pflag.BoolP("no-log-color", "", false, "do not colorize log output")
 	noRemove     = pflag.BoolP("no-remove", "", false, "do not remove container at the end of the process")
 
@@ -167,7 +168,7 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = steps.Package(dock, n, *dpkgFlags, *network)
+	err = steps.Package(dock, n, *dpkgFlags, *network, *noTest)
 	if err != nil {
 		return err
 	}
