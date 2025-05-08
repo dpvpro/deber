@@ -19,7 +19,7 @@ const (
 	// Program is the name of program
 	Program = "deber"
 	// Version of program
-	Version = "1.4.7"
+	Version = "1.4.8"
 	// Description of program
 	Description = "Debian packaging with Docker"
 )
@@ -44,6 +44,7 @@ var (
 )
 
 func main() {
+	
 	cmd := &cobra.Command{
 		Use:                   fmt.Sprintf("%s [FLAGS ...]", Program),
 		Short:                 Description,
@@ -55,14 +56,12 @@ func main() {
 		DisableFlagsInUseLine: true,
 	}
 
-	// cmd.SetHelpCommand(&cobra.Command{Hidden: true})
-	// cmd.DisableFlagsInUseLine = true
-
 	err := cmd.Execute()
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
+	
 }
 
 func run(cmd *cobra.Command, args []string) error {
@@ -80,11 +79,9 @@ func run(cmd *cobra.Command, args []string) error {
 
 	if *systemDir == "" {
 		*systemDir = filepath.Join(os.TempDir(), Program)
-		packagesDir = filepath.Join(*systemDir, "packages")
-	} else {
-		packagesDir = *systemDir
 	}
-
+	
+	packagesDir = filepath.Join(*systemDir, "packages")
 	sources := filepath.Join(*systemDir, "sources")
 
 	if *buildDir == "" {
