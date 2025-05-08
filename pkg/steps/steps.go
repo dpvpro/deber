@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -227,9 +228,12 @@ func Tarball(n *naming.Naming) error {
 	if err != nil {
 		return log.Failed(err)
 	}
-
+	
+	extensions := []string{"gz","xz","bz2"}
 	for _, f := range sourceFiles {
-		if strings.HasPrefix(f.Name(), tarball) && (strings.HasSuffix(f.Name(), ".gz") || strings.HasSuffix(f.Name(), ".xz") || strings.HasSuffix(f.Name(), ".bz2")) {
+		splitFileNameByDot := strings.Split(f.Name(), ".")
+		extensionInFile := splitFileNameByDot[len(splitFileNameByDot)-1]
+		if strings.HasPrefix(f.Name(), tarball) && slices.Contains(extensions, extensionInFile) {
 			sourceTarballs = append(sourceTarballs, f.Name())
 		}
 	}

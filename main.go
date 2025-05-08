@@ -19,7 +19,7 @@ const (
 	// Program is the name of program
 	Program = "deber"
 	// Version of program
-	Version = "1.4.9"
+	Version = "1.5.0"
 	// Description of program
 	Description = "Debian packaging with Docker"
 )
@@ -44,7 +44,7 @@ var (
 )
 
 func main() {
-	
+
 	cmd := &cobra.Command{
 		Use:                   fmt.Sprintf("%s [FLAGS ...]", Program),
 		Short:                 Description,
@@ -61,7 +61,7 @@ func main() {
 		log.Error(err)
 		os.Exit(1)
 	}
-	
+
 }
 
 func run(cmd *cobra.Command, args []string) error {
@@ -80,7 +80,7 @@ func run(cmd *cobra.Command, args []string) error {
 	if *systemDir == "" {
 		*systemDir = filepath.Join(os.TempDir(), Program)
 	}
-	
+
 	packagesDir = filepath.Join(*systemDir, "packages")
 	sources := filepath.Join(*systemDir, "sources")
 
@@ -169,7 +169,7 @@ func run(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		errRemove := steps.Remove(dock, n)
 		if errRemove != nil {
-			 fmt.Printf("%s", errRemove)
+			fmt.Printf("%s", errRemove)
 		}
 		return err
 	}
