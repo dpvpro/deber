@@ -229,7 +229,7 @@ func Tarball(n *naming.Naming) error {
 	}
 
 	for _, f := range sourceFiles {
-		if strings.HasPrefix(f.Name(), tarball) && (strings.HasSuffix(f.Name(), ".gz") || strings.HasSuffix(f.Name(), ".xz")) {
+		if strings.HasPrefix(f.Name(), tarball) && (strings.HasSuffix(f.Name(), ".gz") || strings.HasSuffix(f.Name(), ".xz") || strings.HasSuffix(f.Name(), ".bz2")) {
 			sourceTarballs = append(sourceTarballs, f.Name())
 		}
 	}
