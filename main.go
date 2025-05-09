@@ -167,6 +167,10 @@ func run(cmd *cobra.Command, args []string) error {
 
 	err = steps.Package(dock, n, *dpkgFlags, *network, *noTest)
 	if err != nil {
+		errStop := steps.Stop(dock, n)
+		if errStop!= nil {
+			fmt.Printf("%s", errStop)
+		}
 		errRemove := steps.Remove(dock, n)
 		if errRemove != nil {
 			fmt.Printf("%s", errRemove)
