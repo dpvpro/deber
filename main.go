@@ -32,7 +32,7 @@ var (
 	dpkgFlags    = pflag.StringP("dpkg-flags", "D", "-b -uc -tc", "additional flags to be passed to dpkg-buildpackage in container")
 	lintianFlags = pflag.StringP("lintian-flags", "L", "-i -I", "additional flags to be passed to lintian in container")
 	packages     = pflag.StringArrayP("package", "P", nil, "additional packages to be installed in container (either single .deb or a directory)")
-	age          = pflag.DurationP("age", "a", time.Hour*24*14, "time after which image will be refreshed")
+	age          = pflag.DurationP("age", "a", time.Hour*24*7, "time after which image will be refreshed")
 	network      = pflag.BoolP("network", "n", false, "allow network access during package build")
 	shell        = pflag.BoolP("shell", "s", false, "launch interactive shell in container")
 	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
@@ -82,7 +82,7 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	packagesDir = filepath.Join(*systemDir, "packages")
-	sources := filepath.Join(*systemDir, "sources")
+	sourcesDir := filepath.Join(*systemDir, "sources")
 
 	if *buildDir == "" {
 		*buildDir = filepath.Join(*systemDir, "builddir")
@@ -100,7 +100,7 @@ func run(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	err = os.MkdirAll(sources, os.ModePerm)
+	err = os.MkdirAll(sourcesDir, os.ModePerm)
 	if err != nil {
 		return err
 	}
