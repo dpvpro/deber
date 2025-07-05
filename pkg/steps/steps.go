@@ -334,12 +334,12 @@ func Depends(dock *docker.Docker, n *naming.Naming, extraPackages []string) erro
 
 // Package function executes "dpkg-buildpackage" in container.
 // Enables network back.
-func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwork bool, noTest bool) error {
+func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwork bool, tests bool) error {
 	log.Info("Packaging software")
 	log.Drop()
 
 	cmd := "dpkg-buildpackage " + dpkgFlags
-	if noTest {
+	if !tests {
 		cmd = "DEB_BUILD_OPTIONS='nocheck nodoc notest' " + cmd
 	}
 	args := docker.ContainerExecArgs{
