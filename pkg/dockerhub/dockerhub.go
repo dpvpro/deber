@@ -17,11 +17,10 @@ import (
 //
 // https://stackoverflow.com/questions/48856693/dockerhub-api-listing-tags
 // curl -s GET 'https://hub.docker.com/v2/repositories/library/debian/tags?page_size=1000' | jq -r '.results|.[]|.name
-//
 func GetTags(repo string) ([]string, error) {
-	
+
 	var tags []string
-	
+
 	url := fmt.Sprintf("https://hub.docker.com/v2/repositories/library/%s/tags?page_size=1000", repo)
 
 	response, err := http.Get(url)
@@ -39,9 +38,9 @@ func GetTags(repo string) ([]string, error) {
 		return nil, err
 	}
 
- 	jsonRaw := string(bytes)
+	jsonRaw := string(bytes)
 
- 	jq := gojsonq.New().FromString(jsonRaw)
+	jq := gojsonq.New().FromString(jsonRaw)
 	if jq.Error() != nil {
 		return nil, err
 	}

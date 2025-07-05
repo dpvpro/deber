@@ -2,8 +2,8 @@
 package util
 
 import (
-	"slices"
 	"github.com/docker/docker/api/types/mount"
+	"slices"
 )
 
 // CompareMounts function simply compares if given mounts are equal
@@ -14,10 +14,10 @@ func CompareMounts(a, b []mount.Mount) bool {
 
 	matches := 0
 	for _, aMount := range a {
-	   if slices.Contains(b, aMount) {
+		if slices.Contains(b, aMount) {
 			matches++
 		}
 	}
-	
-	return matches == len(a) 
+
+	return matches == len(a)
 }

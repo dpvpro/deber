@@ -228,8 +228,8 @@ func Tarball(n *naming.Naming) error {
 	if err != nil {
 		return log.Failed(err)
 	}
-	
-	extensions := []string{"gz","xz","bz2"}
+
+	extensions := []string{"gz", "xz", "bz2"}
 	for _, f := range sourceFiles {
 		splitFileNameByDot := strings.Split(f.Name(), ".")
 		extensionInFile := splitFileNameByDot[len(splitFileNameByDot)-1]
@@ -359,7 +359,7 @@ func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwor
 func Test(dock *docker.Docker, n *naming.Naming, lintianFlags string, lintian bool) error {
 
 	log.Info("Testing package")
-	
+
 	// skip tests
 	if !lintian {
 		return log.Skipped()

@@ -142,7 +142,7 @@ func (docker *Docker) ContainerCreate(args ContainerCreateArgs) error {
 // ContainerStart function starts container, just that.
 func (docker *Docker) ContainerStart(name string) error {
 	options := container.StartOptions{}
-	return docker.cli.ContainerStart(docker.ctx, name, options )
+	return docker.cli.ContainerStart(docker.ctx, name, options)
 }
 
 // ContainerStop function stops container, just that.
@@ -193,7 +193,7 @@ func (docker *Docker) ContainerMounts(name string) ([]mount.Mount, error) {
 //
 // Command can be empty, in that case just bash is executed.
 func (docker *Docker) ContainerExec(args ContainerExecArgs) error {
- 	config := container.ExecOptions{
+	config := container.ExecOptions{
 		Cmd:          []string{"bash"},
 		WorkingDir:   args.WorkDir,
 		AttachStdin:  args.Interactive,
@@ -288,8 +288,8 @@ func (docker *Docker) ContainerExecResize(execID string, fd uintptr) error {
 	}
 
 	options := container.ResizeOptions{
-  	Height: uint(winSize.Height),
-  	Width:  uint(winSize.Width),
+		Height: uint(winSize.Height),
+		Width:  uint(winSize.Width),
 	}
 
 	err = docker.cli.ContainerExecResize(docker.ctx, execID, options)
