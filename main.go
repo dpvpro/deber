@@ -178,7 +178,7 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = steps.Test(dock, n, *lintianFlags, *lintian)
+	err = steps.Lint(dock, n, *lintianFlags, *lintian)
 	if err != nil {
 		return err
 	}

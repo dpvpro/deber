@@ -355,10 +355,10 @@ func Package(dock *docker.Docker, n *naming.Naming, dpkgFlags string, withNetwor
 	return log.Done()
 }
 
-// Test function executes "debi", "debc" and "lintian" in container.
-func Test(dock *docker.Docker, n *naming.Naming, lintianFlags string, lintian bool) error {
+// Lint function executes "debi", "debc" and "lintian" in container.
+func Lint(dock *docker.Docker, n *naming.Naming, lintianFlags string, lintian bool) error {
 
-	log.Info("Testing package")
+	log.Info("Linting package")
 
 	// skip tests
 	if !lintian {
