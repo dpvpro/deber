@@ -13,7 +13,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	github.com/thedevsaddam/gojsonq v2.3.0+incompatible
-	pault.ag/go/debian v0.16.0
+	pault.ag/go/debian v0.19.0
 )
 
 require (
@@ -51,4 +51,4 @@ require (
 	gotest.tools/v3 v3.5.1 // indirect
 )
 
-go 1.21
+go 1.23.0
