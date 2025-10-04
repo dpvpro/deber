@@ -1,4 +1,4 @@
-# deber
+# Deber
 
 ![](https://github.com/dpvpro/deber/workflows/Tests/badge.svg)
 [![GoDoc](https://godoc.org/github.com/dpvpro/deber?status.svg)](https://godoc.org/github.com/dpvpro/deber)
@@ -9,10 +9,6 @@
 Utility made with simplicity in mind to provide
 an easy way for building Debian packages in
 Docker containers.
-
-## Screencast
-
-[![asciicast](https://asciinema.org/a/H2bjgbvzYnFNZLvEZruztIdnZ.svg)](https://asciinema.org/a/H2bjgbvzYnFNZLvEZruztIdnZ)
 
 ## Features
 
