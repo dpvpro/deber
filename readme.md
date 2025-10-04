@@ -1,4 +1,4 @@
-# deber
+# Deber
 
 ![](https://github.com/dpvpro/deber/workflows/Tests/badge.svg)
 [![GoDoc](https://godoc.org/github.com/dpvpro/deber?status.svg)](https://godoc.org/github.com/dpvpro/deber)
