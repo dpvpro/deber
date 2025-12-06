@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -16,17 +17,15 @@ import (
 
 // IsImageBuilt function check if image with given name is built.
 func (docker *Docker) IsImageBuilt(name string) (bool, error) {
-	list, err := docker.cli.ImageList(docker.ctx, image.ListOptions{})
+	list_images, err := docker.cli.ImageList(docker.ctx, image.ListOptions{})
 
 	if err != nil {
 		return false, err
 	}
 
-	for i := range list {
-		for j := range list[i].RepoTags {
-			if list[i].RepoTags[j] == name {
-				return true, nil
-			}
+	for _, tags := range list_images {
+		if slices.Contains(tags.RepoTags, name) {
+			return true, nil
 		}
 	}
 

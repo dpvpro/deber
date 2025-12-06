@@ -1,5 +1,7 @@
 module github.com/dpvpro/deber
 
+go 1.21
+
 retract (
 	v1.3.1 // experiment
 	v1.3.0 // experiment
@@ -50,5 +52,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.5.1 // indirect
 )
-
-go 1.21
