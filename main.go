@@ -28,7 +28,7 @@ var (
 	buildDir     = pflag.StringP("build-dir", "B", "", "where to place build stuff")
 	cacheDir     = pflag.StringP("cache-dir", "C", "", "where to place cached stuff")
 	systemDir    = pflag.StringP("system-dir", "S", "", "system directory for deber")
-	distribution = pflag.StringP("distribution", "T", "", "override target distribution")
+	targetDist   = pflag.StringP("target-dist", "T", "", "override target distribution")
 	dpkgFlags    = pflag.StringP("dpkg-flags", "D", "-b -uc -tc", "additional flags to be passed to dpkg-buildpackage in container")
 	lintianFlags = pflag.StringP("lintian-flags", "L", "-i -I", "additional flags to be passed to lintian in container")
 	packages     = pflag.StringArrayP("package", "P", nil, "additional packages to be installed in container (either single .deb or a directory)")
@@ -119,8 +119,8 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if *distribution == "" {
-		*distribution = ch.Target
+	if *targetDist == "" {
+		*targetDist = ch.Target
 	}
 
 	namingArgs := naming.Args{
@@ -128,7 +128,7 @@ func run(cmd *cobra.Command, args []string) error {
 		Source:          ch.Source,
 		Version:         ch.Version.String(),
 		Upstream:        ch.Version.Version,
-		Target:          *distribution,
+		Target:          *targetDist,
 		SourceBaseDir:   cwd,
 		BuildBaseDir:    *buildDir,
 		CacheBaseDir:    *cacheDir,
