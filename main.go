@@ -41,6 +41,7 @@ var (
 	noRemove     = pflag.BoolP("no-remove", "", false, "do not remove container at the end of the process")
 
 	packagesDir string
+	sourcesDir  string
 )
 
 func main() {
@@ -81,9 +82,6 @@ func run(cmd *cobra.Command, args []string) error {
 		*systemDir = filepath.Join(os.TempDir(), Program)
 	}
 
-	packagesDir = filepath.Join(*systemDir, "packages")
-	sourcesDir := filepath.Join(*systemDir, "sources")
-
 	if *buildDir == "" {
 		*buildDir = filepath.Join(*systemDir, "builddir")
 	}
@@ -92,23 +90,10 @@ func run(cmd *cobra.Command, args []string) error {
 		*cacheDir = filepath.Join(*systemDir, "cachedir")
 	}
 
-	err = os.MkdirAll(*systemDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(packagesDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(sourcesDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(*buildDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(*cacheDir, os.ModePerm)
+	packagesDir = filepath.Join(*systemDir, "packages")
+	sourcesDir = filepath.Join(*systemDir, "sources")
+
+	err = createDirs(*systemDir, *buildDir, *cacheDir, packagesDir, sourcesDir)
 	if err != nil {
 		return err
 	}
@@ -201,5 +186,14 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	return nil
+}
+
+func createDirs(dirs ...string) error {
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+			return err
+		}
+	}
 	return nil
 }
