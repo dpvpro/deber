@@ -92,23 +92,7 @@ func run(cmd *cobra.Command, args []string) error {
 		*cacheDir = filepath.Join(*systemDir, "cachedir")
 	}
 
-	err = os.MkdirAll(*systemDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(packagesDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(sourcesDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(*buildDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(*cacheDir, os.ModePerm)
+	err = createDirs(*systemDir, packagesDir, sourcesDir, *buildDir, *cacheDir)
 	if err != nil {
 		return err
 	}
@@ -201,5 +185,14 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	return nil
+}
+
+func createDirs(dirs ...string) error {
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+			return err
+		}
+	}
 	return nil
 }
