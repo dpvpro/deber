@@ -3,10 +3,7 @@ Section: utils
 Priority: optional
 Maintainer: Denis Proskurin <dpvpro@gmail.com>
 Rules-Requires-Root: no
-Build-Depends:
- debhelper-compat (= 12),
- dh-golang,
- golang-any,
+Build-Depends: debhelper-compat (= 13), dh-golang, golang
 Standards-Version: 4.6.2
 Homepage: https://github.com/dpvpro/deber
 XS-Go-Import-Path: github.com/dpvpro/deber
