@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+export GO111MODULE = on
+export GOPROXY = https://proxy.golang.org,direct
+
+%:
+	dh $@
+
+# override_dh_auto_configure:
+# 	go mod download
+
+override_dh_auto_build:
+	go mod download
+	go build -v -o deber_no_vendor .
+
+override_dh_auto_install:
+	install -D -m 0755 deber_no_vendor debian/deber/usr/bin/deber
+
+override_dh_auto_clean:
+	# go clean
+	rm -f deber_no_vendor
+
+override_dh_dwz:
