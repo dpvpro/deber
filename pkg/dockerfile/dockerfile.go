@@ -3,8 +3,9 @@ package dockerfile
 
 import (
 	"bytes"
-	"github.com/dpvpro/deber/pkg/naming"
 	"text/template"
+
+	"github.com/dpvpro/deber/pkg/naming"
 )
 
 // Template struct defines parameters passed to
@@ -38,7 +39,7 @@ RUN printf "Package: *\nPin: origin \"\"\nPin-Priority: 990\n" > /etc/apt/prefer
 RUN apt-get update && \
 	apt-get install --no-install-recommends -y \
 	build-essential devscripts debhelper lintian fakeroot dpkg-dev \
-	ranger neovim 
+	ranger neovim golang dh-golang git mc lf
 
 # Set working directory.
 WORKDIR {{ .SourceDir }}
