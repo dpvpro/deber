@@ -184,13 +184,9 @@ func (docker *Docker) ContainerMounts(name string) ([]mount.Mount, error) {
 }
 
 // ContainerExec function executes a command in running container.
-//
 // Command is executed in bash shell by default.
-//
 // Command can be executed as root.
-//
 // Command can be executed interactively.
-//
 // Command can be empty, in that case just bash is executed.
 func (docker *Docker) ContainerExec(args ContainerExecArgs) error {
 	config := container.ExecOptions{
