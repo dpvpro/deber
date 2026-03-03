@@ -1,9 +1,5 @@
 # Deber
 
-![](https://github.com/dpvpro/deber/workflows/Tests/badge.svg)
-[![GoDoc](https://godoc.org/github.com/dpvpro/deber?status.svg)](https://godoc.org/github.com/dpvpro/deber)
-[![go report card](https://goreportcard.com/badge/github.com/dpvpro/deber)](https://goreportcard.com/report/github.com/dpvpro/deber)
-
 ### `Debian` **+** `Docker` **=** `Deber`
 
 Utility made with simplicity in mind to provide
@@ -96,7 +92,3 @@ Make a new entry with desired target distribution in `debian/changelog`
 and run `deber`.
 
 Or specify the desired distribution with `--distribution` option.
-
-## CONTRIBUTING
-
-I appreciate any contributions, so feel free to do so!
