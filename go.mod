@@ -1,6 +1,6 @@
 module github.com/dpvpro/deber
 
-go 1.25.7
+go 1.24.12
 
 retract (
 	v1.3.1 // experiment
