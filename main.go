@@ -34,6 +34,7 @@ var (
 	packages     = pflag.StringArrayP("package", "P", nil, "additional packages to be installed in container (either single .deb or a directory)")
 	age          = pflag.DurationP("age", "a", time.Hour*24*7, "time after which image will be refreshed")
 	network      = pflag.BoolP("network", "n", false, "allow network access during package build")
+	rebuild      = pflag.BoolP("rebuild", "r", false, "force rebuild image")
 	shell        = pflag.BoolP("shell", "s", false, "launch interactive shell in container")
 	lintian      = pflag.BoolP("lintian", "l", false, "run lintian in container")
 	tests        = pflag.BoolP("tests", "t", false, "do not test when building package")
@@ -121,7 +122,7 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 	n := naming.New(namingArgs)
 
-	err = steps.Build(dock, n, *age)
+	err = steps.Build(dock, n, *age, *rebuild)
 	if err != nil {
 		return err
 	}

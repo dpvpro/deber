@@ -29,14 +29,14 @@ import (
 // If image exists and is old enough, it will be rebuilt.
 //
 // At last it commands Docker Engine to build image.
-func Build(dock *docker.Docker, n *naming.Naming, maxAge time.Duration) error {
+func Build(dock *docker.Docker, n *naming.Naming, maxAge time.Duration, forceRebuild bool) error {
 	log.Info("Building image")
 
 	isImageBuilt, err := dock.IsImageBuilt(n.Image)
 	if err != nil {
 		return log.Failed(err)
 	}
-	if isImageBuilt {
+	if isImageBuilt && !forceRebuild {
 		age, err := dock.ImageAge(n.Image)
 		if err != nil {
 			return log.Failed(err)
