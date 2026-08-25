@@ -9,21 +9,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/pkg/jsonmessage"
+	// "github.com/moby/moby/api/types/image"
+	"github.com/moby/moby/client"
+	"github.com/moby/moby/client/pkg/jsonmessage"
 	"github.com/moby/term"
 )
 
 // IsImageBuilt function check if image with given name is built.
 func (docker *Docker) IsImageBuilt(name string) (bool, error) {
-	list_images, err := docker.cli.ImageList(docker.ctx, image.ListOptions{})
+	list_images, err := docker.cli.ImageList(docker.ctx, client.ImageListOptions{})
 
 	if err != nil {
 		return false, err
 	}
 
-	for _, tags := range list_images {
+	for _, tags := range list_images.Items {
 		if slices.Contains(tags.RepoTags, name) {
 			return true, nil
 		}
@@ -34,7 +34,7 @@ func (docker *Docker) IsImageBuilt(name string) (bool, error) {
 
 // ImageAge function returns the time since image creation.
 func (docker *Docker) ImageAge(name string) (time.Duration, error) {
-	inspect, _, err := docker.cli.ImageInspectWithRaw(docker.ctx, name)
+	inspect, err := docker.cli.ImageInspect(docker.ctx, name)
 	if err != nil {
 		return time.Second, err
 	}
@@ -51,7 +51,7 @@ func (docker *Docker) ImageBuild(name string, dockerFile []byte) error {
 		Name: "Dockerfile",
 		Size: int64(len(dockerFile)),
 	}
-	options := types.ImageBuildOptions{
+	options := client.ImageBuildOptions{
 		Tags:       []string{name},
 		Remove:     true,
 		PullParent: true,
@@ -88,7 +88,7 @@ func (docker *Docker) ImageBuild(name string, dockerFile []byte) error {
 		return err
 	}
 
-	_, _, err = docker.cli.ImageInspectWithRaw(docker.ctx, name)
+	_, err = docker.cli.ImageInspect(docker.ctx, name)
 	if err != nil {
 		return errors.New("image didn't built successfully")
 	}
@@ -99,7 +99,7 @@ func (docker *Docker) ImageBuild(name string, dockerFile []byte) error {
 // ImageList returns a list of images that match passed criteria.
 func (docker *Docker) ImageList(prefix string) ([]string, error) {
 	images := make([]string, 0)
-	options := image.ListOptions{
+	options := client.ImageListOptions{
 		All: true,
 	}
 
@@ -108,7 +108,7 @@ func (docker *Docker) ImageList(prefix string) ([]string, error) {
 		return nil, err
 	}
 
-	for _, v := range list {
+	for _, v := range list.Items {
 		for _, name := range v.RepoTags {
 			name = strings.TrimPrefix(name, "/")
 
@@ -123,10 +123,7 @@ func (docker *Docker) ImageList(prefix string) ([]string, error) {
 
 // ImageRemove function removes image with given name.
 func (docker *Docker) ImageRemove(name string) error {
-	// options := types.ImageRemoveOptions{
-	// 	PruneChildren: true,
-	// }
-	options := image.RemoveOptions{
+	options := client.ImageRemoveOptions{
 		PruneChildren: true,
 	}
 	_, err := docker.cli.ImageRemove(docker.ctx, name, options)

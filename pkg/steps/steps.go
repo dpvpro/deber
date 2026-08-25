@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types/mount"
+	"github.com/moby/moby/api/types/mount"
 	"github.com/dpvpro/deber/pkg/docker"
 	"github.com/dpvpro/deber/pkg/dockerfile"
 	"github.com/dpvpro/deber/pkg/dockerhub"

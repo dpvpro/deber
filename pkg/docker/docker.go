@@ -4,7 +4,7 @@ package docker
 import (
 	"context"
 
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/client"
 )
 
 const (
@@ -20,7 +20,7 @@ type Docker struct {
 
 // New function creates fresh Docker struct and connects to Docker Engine.
 func New() (*Docker, error) {
-	cli, err := client.NewClientWithOpts(client.WithVersion(APIVersion))
+	cli, err := client.New(client.WithAPIVersion(APIVersion))
 	if err != nil {
 		return nil, err
 	}
