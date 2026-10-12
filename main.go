@@ -94,7 +94,8 @@ func run(cmd *cobra.Command, args []string) error {
 	packagesDir = filepath.Join(*systemDir, "packages")
 	sourcesDir = filepath.Join(*systemDir, "sources")
 
-	err = createDirs(*systemDir, *buildDir, *cacheDir, packagesDir, sourcesDir)
+	sysDir := []string{*systemDir, *buildDir, *cacheDir, packagesDir, sourcesDir}
+	err = createDirs(sysDir...)
 	if err != nil {
 		return err
 	}
